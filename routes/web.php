@@ -2,11 +2,16 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PaymentWebhookController;
+use App\Http\Controllers\CronController;
 use App\Livewire\Admin\AuditLogs as AdminAuditLogs;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
+use App\Livewire\Admin\Settlements as AdminSettlements;
 use App\Livewire\Admin\Tenants as AdminTenants;
 use App\Livewire\Admin\Transactions as AdminTransactions;
 use App\Livewire\Admin\Users as AdminUsers;
+use App\Livewire\Auth\ForcePassword;
+use App\Livewire\Auth\SetPassword;
 use App\Livewire\Buyer\Account;
 use App\Livewire\Buyer\Cart;
 use App\Livewire\Buyer\Catalog;
@@ -24,9 +29,20 @@ use Illuminate\Support\Facades\Route;
 // ---------- Auth (tanpa registrasi publik) ----------
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
-    Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:5,1')->name('login.store');
+    Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:login')->name('login.store');
 });
 Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');
+
+// ---------- Onboarding admin-provisioned (set-password via token sekali-pakai) ----------
+Route::get('/aktivasi/{token}', SetPassword::class)->name('onboard');
+Route::get('/ganti-password', ForcePassword::class)->middleware('auth')->name('password.change');
+
+// ---------- Payment webhook (seam Midtrans, dikecualikan dari CSRF) ----------
+Route::post('/webhook/payment/{invoice}', [PaymentWebhookController::class, 'handle'])->name('payment.webhook');
+
+// ---------- Cron platform / shared-hosting (bearer secret) ----------
+Route::post('/cron/auto-cancel', [CronController::class, 'autoCancel'])->name('cron.auto-cancel');
+Route::post('/cron/settlements', [CronController::class, 'settlements'])->name('cron.settlements');
 
 // ---------- Pembeli (siswa / guru / staf sekolah) ----------
 Route::middleware(['auth', 'role:user'])->group(function () {
@@ -57,6 +73,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/transaksi', AdminTransactions::class)->name('transactions');
     Route::get('/tenant', AdminTenants::class)->name('tenants');
     Route::get('/pengguna', AdminUsers::class)->name('users');
+    Route::get('/settlement', AdminSettlements::class)->name('settlements');
     Route::get('/audit-log', AdminAuditLogs::class)->name('audit');
 });
 

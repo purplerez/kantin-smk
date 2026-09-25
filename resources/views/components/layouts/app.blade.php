@@ -14,7 +14,10 @@
                 <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand text-lg font-extrabold text-white">K</span>
                 <span class="text-lg font-extrabold tracking-tight">Kantin<span class="text-brand">SMK</span> Go</span>
             </a>
-            <x-sound-toggle class="ml-auto md:hidden" data-testid="sound-toggle-mobile" />
+            <div class="ml-auto flex items-center gap-1 md:hidden">
+                <livewire:notifications-bell />
+                <x-sound-toggle data-testid="sound-toggle-mobile" />
+            </div>
             <nav class="ml-auto hidden items-center gap-1 md:flex">
                 @foreach ($nav as $item)
                     <a href="{{ route($item['route']) }}" wire:navigate
@@ -27,6 +30,7 @@
                 @endforeach
             </nav>
             <div class="hidden items-center gap-3 md:flex">
+                <livewire:notifications-bell />
                 <x-sound-toggle />
                 <span class="text-sm text-slate-500">{{ $user->name }}</span>
                 <span class="grid h-9 w-9 place-items-center rounded-full bg-accent/15 text-sm font-bold text-accent">{{ $user->initials() }}</span>

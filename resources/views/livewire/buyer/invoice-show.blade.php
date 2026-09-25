@@ -37,10 +37,14 @@
                     </div>
                 @endif
 
-                @if (! $invoice->isPaid() && $method->requiresPrepayment())
+                @if (! $invoice->isPaid() && $method === \App\Enums\PaymentMethod::Qris)
                     <button wire:click="simulatePayment" wire:loading.attr="disabled" class="mt-6 w-full rounded-full bg-brand py-3.5 text-sm font-bold text-white shadow-lg shadow-brand/30 hover:bg-brand-dark disabled:opacity-60 md:w-auto md:px-10" data-testid="simulate-payment-button">
-                        Saya sudah bayar (simulasi demo)
+                        Saya sudah bayar (simulasi QRIS)
                     </button>
+                @elseif (! $invoice->isPaid() && $method === \App\Enums\PaymentMethod::Transfer)
+                    <p class="mt-6 inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-xs font-semibold text-amber-800" data-testid="awaiting-verification">
+                        Menunggu verifikasi pembayaran oleh tenant / admin.
+                    </p>
                 @endif
             </section>
 

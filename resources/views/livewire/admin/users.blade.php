@@ -8,6 +8,19 @@
         </x-slot:actions>
     </x-page-header>
 
+    @if ($activationLink)
+        <div class="mb-5 rounded-2xl border border-brand/40 bg-brand-light/60 p-4" data-testid="activation-link-panel">
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0 flex-1">
+                    <h2 class="text-sm font-extrabold text-brand-dark">Link aktivasi sekali-pakai</h2>
+                    <p class="mt-1 text-xs text-slate-600">Bagikan ke pengguna agar mereka mengatur password sendiri. Kedaluwarsa otomatis & hanya bisa dipakai satu kali.</p>
+                    <input readonly value="{{ $activationLink }}" onclick="this.select()" class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-xs outline-none" data-testid="activation-link-input">
+                </div>
+                <button wire:click="$set('activationLink','')" class="shrink-0 text-xs font-semibold text-slate-500 hover:text-slate-700" data-testid="dismiss-activation-link">Tutup</button>
+            </div>
+        </div>
+    @endif
+
     @if ($showImport)
         <form wire:submit="import" class="mb-5 rounded-2xl border border-slate-200 bg-white p-4" data-testid="import-form">
             <h2 class="text-sm font-extrabold">Import pembeli (siswa/guru) massal</h2>
@@ -52,7 +65,10 @@
                         <td class="px-4 py-3">
                             <button wire:click="toggleActive({{ $user->id }})" @disabled($user->id === auth()->id()) class="rounded-full px-2.5 py-1 text-[11px] font-bold {{ $user->is_active ? 'bg-brand-light text-brand-dark' : 'bg-rose-100 text-rose-700' }} disabled:cursor-not-allowed" data-testid="toggle-active-{{ $user->id }}">{{ $user->is_active ? 'Aktif' : 'Nonaktif' }}</button>
                         </td>
-                        <td class="px-4 py-3 text-right"><button wire:click="edit({{ $user->id }})" class="rounded-full px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100" data-testid="edit-user-{{ $user->id }}">Edit</button></td>
+                        <td class="px-4 py-3 text-right">
+                            <button wire:click="generateLink({{ $user->id }})" class="rounded-full px-3 py-1.5 text-xs font-bold text-brand-dark hover:bg-brand-light" data-testid="activation-link-{{ $user->id }}">Aktivasi</button>
+                            <button wire:click="edit({{ $user->id }})" class="rounded-full px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100" data-testid="edit-user-{{ $user->id }}">Edit</button>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>

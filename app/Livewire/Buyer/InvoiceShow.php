@@ -18,9 +18,13 @@ class InvoiceShow extends Component
         $this->invoice = $invoice;
     }
 
-    /** DEMO: simulasi callback pembayaran QRIS / transfer. */
+    /** DEMO: simulasi callback QRIS (hanya QRIS; transfer/tunai diverifikasi tenant_admin). */
     public function simulatePayment(CheckoutService $checkout): void
     {
+        if ($this->invoice->payment_method !== \App\Enums\PaymentMethod::Qris) {
+            return;
+        }
+
         $checkout->markInvoicePaid($this->invoice);
         $this->invoice->refresh();
         $this->dispatch('toast', message: 'Pembayaran diterima. Tenant mulai memproses pesananmu!');

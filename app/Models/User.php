@@ -13,7 +13,7 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'identifier', 'password', 'role', 'tenant_id', 'is_active',
+        'name', 'email', 'identifier', 'password', 'role', 'tenant_id', 'is_active', 'must_change_password',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -24,6 +24,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'role' => Role::class,
             'is_active' => 'boolean',
+            'must_change_password' => 'boolean',
         ];
     }
 

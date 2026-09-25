@@ -75,10 +75,73 @@ return new class extends Migration
 
             $table->index(['subject_type', 'subject_id']);
         });
+
+        // ===== Keranjang persisten (session -> DB), bertahan lintas perangkat =====
+        Schema::create('carts', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('buyer_id')->unique()->constrained('users')->cascadeOnDelete();
+            $table->timestamps();
+        });
+
+        Schema::create('cart_items', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('cart_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->unsignedSmallInteger('qty')->default(1);
+            $table->string('note', 120)->nullable();
+            $table->timestamps();
+
+            $table->unique(['cart_id', 'product_id']);
+        });
+
+        // ===== Pembayaran terpisah dari invoice (seam untuk Midtrans via webhook) =====
+        Schema::create('payments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
+            $table->enum('method', ['qris', 'transfer', 'cash']);
+            $table->enum('status', ['pending', 'paid', 'refunded', 'cancelled'])->default('pending')->index();
+            $table->unsignedInteger('amount')->comment('Dihitung server, bukan dari klien');
+            $table->string('reference')->nullable()->comment('VA / referensi QRIS / id transaksi gateway');
+            $table->timestamp('paid_at')->nullable();
+            $table->foreignId('verified_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamps();
+        });
+
+        // ===== Settlement harian per tenant =====
+        Schema::create('tenant_settlements', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
+            $table->date('date');
+            $table->unsignedInteger('orders_count')->default(0);
+            $table->unsignedInteger('gross')->default(0);
+            $table->unsignedInteger('commission')->default(0);
+            $table->unsignedInteger('net')->default(0);
+            $table->foreignId('generated_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamps();
+
+            $table->unique(['tenant_id', 'date']);
+        });
+
+        // ===== Notifikasi in-app (disurface via wire:poll) =====
+        Schema::create('notifications', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('type');
+            $table->json('payload')->nullable();
+            $table->timestamp('read_at')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+
+            $table->index(['user_id', 'read_at']);
+        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('notifications');
+        Schema::dropIfExists('tenant_settlements');
+        Schema::dropIfExists('payments');
+        Schema::dropIfExists('cart_items');
+        Schema::dropIfExists('carts');
         Schema::dropIfExists('audit_logs');
         Schema::dropIfExists('reviews');
         Schema::dropIfExists('order_items');

@@ -4,6 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#00AA13">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="KantinSMK Go">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? config('app.name') }}</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300AA13'/%3E%3Ctext x='16' y='23' font-family='sans-serif' font-weight='800' font-size='20' fill='white' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
@@ -64,6 +69,13 @@
             });
         </script>
     @endif
+
+    {{-- PWA: service worker minimal (network-first shell, tanpa offline — Livewire butuh koneksi live). --}}
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+        }
+    </script>
 
     @livewireScripts
 </body>

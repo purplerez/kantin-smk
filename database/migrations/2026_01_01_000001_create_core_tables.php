@@ -31,6 +31,7 @@ return new class extends Migration
             $table->enum('role', ['admin', 'tenant_admin', 'tenant_staf', 'user'])->default('user')->index();
             $table->foreignId('tenant_id')->nullable()->constrained()->nullOnDelete();
             $table->boolean('is_active')->default(true);
+            $table->boolean('must_change_password')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });
@@ -55,10 +56,18 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+
+        // Dipakai untuk onboarding admin-provisioned (set-password via token) — hanya hash yang disimpan.
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('products');
         Schema::dropIfExists('categories');
         Schema::dropIfExists('users');

@@ -13,6 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+        $middleware->validateCsrfTokens(except: ['webhook/*', 'cron/*']);
         $middleware->redirectGuestsTo('/login');
         $middleware->redirectUsersTo(fn () => route('home'));
         $middleware->alias([

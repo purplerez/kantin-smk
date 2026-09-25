@@ -1,6 +1,28 @@
 <div>
     <x-page-header title="Pembayaran & settlement" eyebrow="Keuangan tenant" />
 
+    @if ($pendingTransfers->isNotEmpty())
+        <section class="mb-6 rounded-2xl border border-sky-200 bg-sky-50/60" data-testid="pending-transfers">
+            <header class="border-b border-sky-100 px-4 py-3">
+                <h2 class="text-base font-extrabold">Transfer menunggu verifikasi <span class="ml-1 rounded-full bg-sky-100 px-2 py-0.5 text-xs text-sky-800" data-testid="pending-transfer-count">{{ $pendingTransfers->count() }}</span></h2>
+                <p class="text-xs text-slate-500">Cek mutasi rekening lalu tandai lunas. Hanya tenant admin / platform admin (backend policy).</p>
+            </header>
+            <ul class="divide-y divide-sky-100">
+                @foreach ($pendingTransfers as $invoiceId => $orders)
+                    @php($inv = $orders->first()->invoice)
+                    <li class="flex items-center gap-3 px-4 py-3 text-sm" wire:key="transfer-{{ $invoiceId }}" data-testid="pending-transfer-{{ $invoiceId }}">
+                        <div class="min-w-0 flex-1">
+                            <strong class="block font-mono text-xs">{{ $inv->code }}</strong>
+                            <span class="block truncate text-xs text-slate-500">{{ $orders->first()->buyer->name }} · VA {{ $inv->payment_reference }}</span>
+                        </div>
+                        <strong>@rupiah($orders->sum('subtotal'))</strong>
+                        <button wire:click="confirmTransfer({{ $invoiceId }})" wire:confirm="Konfirmasi transfer sudah masuk?" class="rounded-full bg-brand px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-dark" data-testid="verify-transfer-{{ $invoiceId }}">Verifikasi</button>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
+
     <div class="grid gap-6 lg:grid-cols-[1fr_1fr]">
         {{-- Verifikasi tunai --}}
         <section class="rounded-2xl border border-slate-200 bg-white">
@@ -32,6 +54,7 @@
                 <div class="flex items-center gap-1 text-xs">
                     <input type="date" wire:model.live="from" class="rounded-lg border border-slate-200 px-2 py-1" data-testid="settlement-from"> –
                     <input type="date" wire:model.live="to" class="rounded-lg border border-slate-200 px-2 py-1" data-testid="settlement-to">
+                    <button wire:click="generateSettlement" class="ml-1 rounded-full bg-slate-900 px-3 py-1.5 font-bold text-white" data-testid="generate-settlement-button">Generate</button>
                 </div>
             </header>
             @if ($settlement->isEmpty())
@@ -59,6 +82,26 @@
             @endif
         </section>
     </div>
+
+    @if ($stored->isNotEmpty())
+        <section class="mt-6 rounded-2xl border border-slate-200 bg-white" data-testid="stored-settlements">
+            <header class="border-b border-slate-100 px-4 py-3"><h2 class="text-base font-extrabold">Settlement tersimpan</h2><p class="text-xs text-slate-500">Hasil perhitungan harian (tabel tenant_settlements).</p></header>
+            <table class="w-full text-sm">
+                <thead class="bg-slate-50 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500"><tr><th class="px-4 py-2">Tanggal</th><th class="px-4 py-2">Order</th><th class="px-4 py-2 text-right">Bruto</th><th class="px-4 py-2 text-right">Komisi</th><th class="px-4 py-2 text-right">Neto</th></tr></thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach ($stored as $s)
+                        <tr wire:key="stored-{{ $s->id }}" data-testid="stored-settlement-{{ $s->date->toDateString() }}">
+                            <td class="px-4 py-2">{{ $s->date->translatedFormat('d M Y') }}</td>
+                            <td class="px-4 py-2">{{ $s->orders_count }}</td>
+                            <td class="px-4 py-2 text-right">@rupiah($s->gross)</td>
+                            <td class="px-4 py-2 text-right text-rose-600">@rupiah($s->commission)</td>
+                            <td class="px-4 py-2 text-right font-bold text-brand-dark">@rupiah($s->net)</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </section>
+    @endif
 
     @if ($refunds->isNotEmpty())
         <section class="mt-6 rounded-2xl border border-slate-200 bg-white">

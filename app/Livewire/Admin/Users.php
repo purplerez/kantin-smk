@@ -6,6 +6,8 @@ use App\Enums\Role;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Services\AuditLogger;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
@@ -49,6 +51,8 @@ class Users extends Component
 
     public array $importResult = [];
 
+    public string $activationLink = '';
+
     protected function rules(): array
     {
         return [
@@ -57,7 +61,7 @@ class Users extends Component
             'identifier' => ['nullable', 'string', 'max:30', Rule::unique('users', 'identifier')->ignore($this->editingId)],
             'role' => ['required', new Enum(Role::class)],
             'tenant_id' => [Rule::requiredIf(fn () => Role::from($this->role)->isTenant()), 'nullable', 'exists:tenants,id'],
-            'password' => [$this->editingId ? 'nullable' : 'required', 'string', 'min:6', 'max:64'],
+            'password' => ['nullable', 'string', 'min:6', 'max:64'],
         ];
     }
 
@@ -73,7 +77,7 @@ class Users extends Component
 
     public function create(): void
     {
-        $this->reset('editingId', 'name', 'email', 'identifier', 'tenant_id', 'password');
+        $this->reset('editingId', 'name', 'email', 'identifier', 'tenant_id', 'password', 'activationLink');
         $this->role = 'user';
         $this->showForm = true;
     }
@@ -105,15 +109,44 @@ class Users extends Component
 
         if ($this->editingId) {
             $user = User::findOrFail($this->editingId);
+            if (isset($data['password'])) {
+                $data['must_change_password'] = true; // paksa ganti saat login berikutnya
+            }
             $user->update($data);
             AuditLogger::log('user.updated', $user, ['role' => $data['role'], 'password_reset' => isset($data['password'])]);
+            $this->showForm = false;
+            $this->dispatch('toast', message: 'Akun diperbarui.');
         } else {
-            $user = User::create($data + ['is_active' => true]);
+            $data['is_active'] = true;
+            $data['must_change_password'] = true; // wajib set password via link aktivasi
+            $data['password'] = $data['password'] ?? Str::password(16);
+            $user = User::create($data);
             AuditLogger::log('user.provisioned', $user, ['role' => $data['role']]);
+            $this->activationLink = $this->issueToken($user);
+            $this->showForm = false;
+            $this->dispatch('toast', message: 'Akun dibuat. Bagikan link aktivasi sekali-pakai di bawah.');
         }
+    }
 
-        $this->showForm = false;
-        $this->dispatch('toast', message: 'Akun tersimpan.');
+    /** Buat/refresh token onboarding (hash-only, sekali-pakai) dan kembalikan link hand-off. */
+    private function issueToken(User $user): string
+    {
+        $token = Str::random(64);
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            ['token' => Hash::make($token), 'created_at' => now()],
+        );
+
+        return route('onboard', $token).'?email='.urlencode($user->email);
+    }
+
+    public function generateLink(int $id): void
+    {
+        $user = User::findOrFail($id);
+        $user->update(['must_change_password' => true]);
+        $this->activationLink = $this->issueToken($user);
+        AuditLogger::log('onboard.link_issued', $user);
+        $this->dispatch('toast', message: 'Link aktivasi dibuat untuk '.$user->email);
     }
 
     public function toggleActive(int $id): void
@@ -155,6 +188,7 @@ class Users extends Component
                 'password' => $parts[3] ?? Str::password(10, symbols: false),
                 'role' => Role::User,
                 'is_active' => true,
+                'must_change_password' => true,
             ]);
             AuditLogger::log('user.provisioned', $user, ['role' => 'user', 'bulk' => true]);
             $created++;

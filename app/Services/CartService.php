@@ -2,54 +2,93 @@
 
 namespace App\Services;
 
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Support\Collection;
 
 /**
- * Keranjang berbasis session (server-side) — tidak butuh JavaScript/localStorage.
- * Struktur: session('cart') = [product_id => ['qty' => int, 'note' => string]]
+ * Keranjang persisten di DB (carts + cart_items), dikunci ke buyer_id.
+ * Bertahan lintas perangkat & session GC. API tetap sama seperti versi session lama.
  */
 class CartService
 {
-    private const KEY = 'cart';
+    private ?Cart $cart = null;
 
+    private function buyerId(): ?int
+    {
+        return auth()->id();
+    }
+
+    private function cart(): ?Cart
+    {
+        if (! $this->buyerId()) {
+            return null;
+        }
+
+        return $this->cart ??= Cart::firstOrCreate(['buyer_id' => $this->buyerId()]);
+    }
+
+    /** [product_id => ['qty' => int, 'note' => string]] — kompatibel dengan pemakaian lama. */
     public function all(): array
     {
-        return session(self::KEY, []);
+        $cart = $this->cart();
+        if (! $cart) {
+            return [];
+        }
+
+        return $cart->items()->get()->mapWithKeys(fn (CartItem $i) => [
+            $i->product_id => ['qty' => (int) $i->qty, 'note' => (string) ($i->note ?? '')],
+        ])->all();
     }
 
     public function count(): int
     {
-        return (int) array_sum(array_column($this->all(), 'qty'));
+        $cart = $this->cart();
+
+        return $cart ? (int) $cart->items()->sum('qty') : 0;
     }
 
     public function add(int $productId, int $qty = 1): void
     {
-        $cart = $this->all();
-        $cart[$productId]['qty'] = ($cart[$productId]['qty'] ?? 0) + $qty;
-        $cart[$productId]['note'] = $cart[$productId]['note'] ?? '';
-        session([self::KEY => $cart]);
+        $cart = $this->cart();
+        if (! $cart) {
+            return;
+        }
+
+        $item = $cart->items()->firstOrNew(['product_id' => $productId]);
+        $item->qty = max(1, (int) $item->qty + $qty);
+        $item->note ??= '';
+        $item->save();
     }
 
     public function setQty(int $productId, int $qty): void
     {
-        $cart = $this->all();
-        if ($qty <= 0) {
-            unset($cart[$productId]);
-        } else {
-            $cart[$productId]['qty'] = $qty;
-            $cart[$productId]['note'] = $cart[$productId]['note'] ?? '';
+        $cart = $this->cart();
+        if (! $cart) {
+            return;
         }
-        session([self::KEY => $cart]);
+
+        if ($qty <= 0) {
+            $cart->items()->where('product_id', $productId)->delete();
+
+            return;
+        }
+
+        $item = $cart->items()->firstOrNew(['product_id' => $productId]);
+        $item->qty = $qty;
+        $item->note ??= '';
+        $item->save();
     }
 
     public function setNote(int $productId, string $note): void
     {
-        $cart = $this->all();
-        if (isset($cart[$productId])) {
-            $cart[$productId]['note'] = mb_substr($note, 0, 120);
-            session([self::KEY => $cart]);
+        $cart = $this->cart();
+        if (! $cart) {
+            return;
         }
+
+        $cart->items()->where('product_id', $productId)->update(['note' => mb_substr($note, 0, 120)]);
     }
 
     public function remove(int $productId): void
@@ -59,41 +98,45 @@ class CartService
 
     public function clear(): void
     {
-        session()->forget(self::KEY);
+        $cart = $this->cart();
+        if ($cart) {
+            $cart->items()->delete();
+        }
     }
 
-    /**
-     * Baris keranjang lengkap dengan model produk, dikelompokkan per tenant.
-     * Produk yang sudah dihapus / tidak ada akan dibuang otomatis dari session.
-     */
+    /** Baris keranjang lengkap + model produk. Produk yang hilang dibersihkan otomatis. */
     public function lines(): Collection
     {
-        $cart = $this->all();
-        if (empty($cart)) {
+        $cart = $this->cart();
+        if (! $cart) {
             return collect();
         }
 
-        $products = Product::with('tenant')->whereIn('id', array_keys($cart))->get()->keyBy('id');
+        $items = $cart->items()->get();
+        if ($items->isEmpty()) {
+            return collect();
+        }
 
-        $lines = collect($cart)->map(function ($row, $id) use ($products) {
-            $product = $products->get($id);
+        $products = Product::with('tenant')->whereIn('id', $items->pluck('product_id'))->get()->keyBy('id');
+
+        $lines = $items->mapWithKeys(function (CartItem $item) use ($products) {
+            $product = $products->get($item->product_id);
             if (! $product) {
-                return null;
+                return [];
             }
 
-            return [
+            return [$item->product_id => [
                 'product' => $product,
-                'qty' => (int) $row['qty'],
-                'note' => $row['note'] ?? '',
-                'line_total' => $product->price * (int) $row['qty'],
+                'qty' => (int) $item->qty,
+                'note' => (string) ($item->note ?? ''),
+                'line_total' => $product->price * (int) $item->qty,
                 'sellable' => $product->isSellable(),
-            ];
-        })->filter();
+            ]];
+        });
 
-        // Bersihkan produk yang sudah tidak ada
-        $missing = array_diff(array_keys($cart), $lines->keys()->all());
-        foreach ($missing as $id) {
-            $this->remove((int) $id);
+        $missing = $items->pluck('product_id')->diff($lines->keys());
+        if ($missing->isNotEmpty()) {
+            $cart->items()->whereIn('product_id', $missing)->delete();
         }
 
         return $lines;
