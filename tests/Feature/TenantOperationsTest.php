@@ -22,10 +22,12 @@ class TenantOperationsTest extends TestCase
     /** Buat 1 invoice dengan order untuk Bu Rina + Koperasi Siswa. */
     private function seedOrders(string $method = 'qris'): void
     {
+        $buyer = $this->buyer();
+        $this->actingAs($buyer);
         $cart = app(CartService::class);
         $cart->add(Product::withoutGlobalScopes()->where('tenant_id', $this->tenantRina()->id)->where('is_available_today', true)->first()->id);
         $cart->add(Product::withoutGlobalScopes()->where('tenant_id', $this->tenantKopsis()->id)->where('is_available_today', true)->first()->id);
-        Livewire::actingAs($this->buyer())->test(Checkout::class)->set('paymentMethod', $method)->call('placeOrder');
+        Livewire::actingAs($buyer)->test(Checkout::class)->set('paymentMethod', $method)->call('placeOrder');
         if ($method !== 'cash') {
             app(\App\Services\CheckoutService::class)->markInvoicePaid(\App\Models\Invoice::first());
         }

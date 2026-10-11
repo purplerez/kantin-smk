@@ -90,7 +90,7 @@
                         <td class="px-4 py-3 text-right font-bold"><?php echo 'Rp'.number_format((int) ($order->subtotal), 0, ',', '.'); ?></td>
                         <td class="px-4 py-3 text-right">
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('cancel', $order)): ?>
-                                <button wire:click="cancel(<?php echo e($order->id); ?>)" wire:confirm="Batalkan <?php echo e($order->code); ?>?" class="text-xs font-bold text-rose-600 hover:underline" data-testid="admin-cancel-<?php echo e($order->id); ?>">Batalkan</button>
+                                <button type="button" wire:click="cancel(<?php echo e($order->id); ?>)" wire:confirm="Batalkan <?php echo e($order->code); ?>?" class="text-xs font-bold text-rose-600 hover:underline" data-testid="admin-cancel-<?php echo e($order->id); ?>">Batalkan</button>
                             <?php endif; ?>
                         </td>
                     </tr>

@@ -65,9 +65,30 @@
         @else
             <div class="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
                 @foreach ($products as $product)
-                    <x-product-card :product="$product" :key="$product->id" />
+                    <x-product-card :product="$product" :cart-qty="$cartItems[$product->id]['qty'] ?? 0" wire:key="product-card-{{ $product->id }}" />
                 @endforeach
             </div>
         @endif
     </section>
+
+    {{-- Floating Sticky Cart Bar --}}
+    @if ($cartCount > 0)
+        <aside class="fixed inset-x-4 bottom-20 z-40 mx-auto max-w-md animate-bounce-subtle md:bottom-6" data-testid="floating-cart-bar">
+            <a href="{{ route('cart') }}" wire:navigate class="flex items-center justify-between rounded-2xl bg-brand px-4 py-3.5 text-white shadow-xl shadow-brand/30 transition hover:bg-brand-dark active:scale-[0.98]">
+                <div class="flex items-center gap-3">
+                    <span class="grid h-8 w-8 place-items-center rounded-xl bg-white/20 text-xs font-black">
+                        {{ $cartCount }}
+                    </span>
+                    <div>
+                        <div class="text-xs font-semibold text-emerald-100">{{ $cartCount }} menu dipilih</div>
+                        <div class="text-sm font-extrabold leading-tight">@rupiah($cartTotal)</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1 text-sm font-bold">
+                    <span>Lihat Keranjang</span>
+                    <x-icon name="bag" class="h-4 w-4" />
+                </div>
+            </a>
+        </aside>
+    @endif
 </div>

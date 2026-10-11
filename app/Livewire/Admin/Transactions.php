@@ -36,8 +36,9 @@ class Transactions extends Component
         $this->resetPage();
     }
 
-    public function cancel(int $orderId, OrderStatusService $service): void
+    public function cancel(int $orderId, ?OrderStatusService $service = null): void
     {
+        $service ??= app(OrderStatusService::class);
         $order = Order::findOrFail($orderId);
         $this->authorize('cancel', $order);
         $service->cancel($order, 'Dibatalkan oleh admin platform');

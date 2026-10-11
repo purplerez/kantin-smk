@@ -20,8 +20,9 @@ class Settlements extends Component
         $this->date = now()->toDateString();
     }
 
-    public function generate(SettlementService $service): void
+    public function generate(?SettlementService $service = null): void
     {
+        $service ??= app(SettlementService::class);
         $service->generateForDate($this->date, auth()->user());
         AuditLogger::log('settlement.generated', null, ['date' => $this->date, 'scope' => 'all']);
         $this->dispatch('toast', message: "Settlement dibuat untuk {$this->date}");

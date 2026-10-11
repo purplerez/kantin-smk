@@ -118,4 +118,35 @@ class AuthAndAdminTest extends TestCase
         $this->tenantRina()->update(['status' => Tenant::STATUS_SUSPENDED]);
         $this->actingAs($this->staff())->get('/tenant-panel/pesanan')->assertForbidden();
     }
+
+    public function test_admin_tenants_and_users_ui_button_actions(): void
+    {
+        $admin = $this->admin();
+        $tenant = $this->tenantRina();
+
+        // 1. Tenants modal open, close, and edit
+        Livewire::actingAs($admin)->test(Tenants::class)
+            ->call('create')->assertSet('showForm', true)
+            ->call('closeForm')->assertSet('showForm', false)
+            ->call('edit', $tenant->id)->assertSet('showForm', true)->assertSet('editingId', $tenant->id)
+            ->set('description', 'Deskripsi diperbarui')
+            ->call('save')->assertSet('showForm', false);
+
+        $this->assertSame('Deskripsi diperbarui', $tenant->refresh()->description);
+
+        // 2. Users modal open, close, toggle import, dismiss link, generate link
+        $user = $this->buyer();
+        $userTest = Livewire::actingAs($admin)->test(Users::class)
+            ->call('create')->assertSet('showForm', true)
+            ->call('closeForm')->assertSet('showForm', false)
+            ->call('toggleImport')->assertSet('showImport', true)
+            ->call('toggleImport')->assertSet('showImport', false)
+            ->call('generateLink', $user->id);
+
+        $this->assertNotSame('', $userTest->get('activationLink'));
+
+        $userTest->call('dismissActivationLink')->assertSet('activationLink', '')
+            ->call('edit', $user->id)->assertSet('showForm', true)
+            ->call('closeForm')->assertSet('showForm', false);
+    }
 }

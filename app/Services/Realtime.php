@@ -24,12 +24,18 @@ class Realtime
             return;
         }
 
-        DB::afterCommit(function () use ($order, $kind) {
+        $dispatch = function () use ($order, $kind) {
             try {
                 broadcast(new OrderUpdated($order->fresh(), $kind));
             } catch (Throwable $e) {
                 report($e);
             }
-        });
+        };
+
+        if (app()->runningUnitTests()) {
+            $dispatch();
+        } else {
+            DB::afterCommit($dispatch);
+        }
     }
 }

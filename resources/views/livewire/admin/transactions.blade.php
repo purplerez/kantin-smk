@@ -33,7 +33,7 @@
                         <td class="px-4 py-3 text-right font-bold">@rupiah($order->subtotal)</td>
                         <td class="px-4 py-3 text-right">
                             @can('cancel', $order)
-                                <button wire:click="cancel({{ $order->id }})" wire:confirm="Batalkan {{ $order->code }}?" class="text-xs font-bold text-rose-600 hover:underline" data-testid="admin-cancel-{{ $order->id }}">Batalkan</button>
+                                <button type="button" wire:click="cancel({{ $order->id }})" wire:confirm="Batalkan {{ $order->code }}?" class="text-xs font-bold text-rose-600 hover:underline" data-testid="admin-cancel-{{ $order->id }}">Batalkan</button>
                             @endcan
                         </td>
                     </tr>

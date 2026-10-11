@@ -11,7 +11,7 @@
 
     <div class="no-scrollbar -mx-4 mb-5 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
         @foreach ($tabs as $key => $label)
-            <button wire:click="setStatus('{{ $key }}')" class="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition {{ $status === $key ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50' }}" data-testid="status-tab-{{ $key }}">
+            <button type="button" wire:click="setStatus('{{ $key }}')" class="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition {{ $status === $key ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50' }}" data-testid="status-tab-{{ $key }}">
                 {{ $label }}
                 @if (isset($counts[$key]) && $counts[$key] > 0) <span class="rounded-full px-1.5 text-[10px] {{ $status === $key ? 'bg-white/20' : 'bg-brand-light text-brand-dark' }}">{{ $counts[$key] }}</span> @endif
             </button>
@@ -46,17 +46,17 @@
 
                     <div class="mt-3 flex flex-wrap gap-2">
                         @can('advance', $order)
-                            <button wire:click="advance({{ $order->id }})" wire:loading.attr="disabled" class="flex-1 rounded-full bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-dark disabled:opacity-60" data-testid="advance-order-{{ $order->id }}-button">
+                            <button type="button" wire:click="advance({{ $order->id }})" wire:loading.attr="disabled" class="flex-1 rounded-full bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-dark disabled:opacity-60" data-testid="advance-order-{{ $order->id }}-button">
                                 Tandai {{ $order->status->next()?->label() }}
                             </button>
                         @endcan
                         @if (! $order->isPaid() && ! $order->status->isFinal())
                             @can('verifyPayment', $order)
-                                <button wire:click="markPaid({{ $order->id }})" wire:confirm="Konfirmasi pembayaran tunai diterima?" class="rounded-full border border-brand px-4 py-2.5 text-xs font-bold text-brand-dark hover:bg-brand-light" data-testid="mark-paid-{{ $order->id }}-button">Terima bayar</button>
+                                <button type="button" wire:click="markPaid({{ $order->id }})" wire:confirm="Konfirmasi pembayaran tunai diterima?" class="rounded-full border border-brand px-4 py-2.5 text-xs font-bold text-brand-dark hover:bg-brand-light" data-testid="mark-paid-{{ $order->id }}-button">Terima bayar</button>
                             @endcan
                         @endif
                         @can('cancel', $order)
-                            <button wire:click="cancel({{ $order->id }})" wire:confirm="Batalkan pesanan {{ $order->code }}?" class="rounded-full px-3 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50" data-testid="cancel-order-{{ $order->id }}-button">Batalkan</button>
+                            <button type="button" wire:click="cancel({{ $order->id }})" wire:confirm="Batalkan pesanan {{ $order->code }}?" class="rounded-full px-3 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50" data-testid="cancel-order-{{ $order->id }}-button">Batalkan</button>
                         @endcan
                     </div>
                     @error('status') <p class="mt-2 text-xs font-semibold text-rose-600">{{ $message }}</p> @enderror

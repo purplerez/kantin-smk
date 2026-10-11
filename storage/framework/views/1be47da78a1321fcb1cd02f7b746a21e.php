@@ -10,7 +10,7 @@
 <?php endif; ?>
 <?php $component->withAttributes(['title' => 'Kelola tenant','eyebrow' => 'Persetujuan & status']); ?>
          <?php $__env->slot('actions', null, []); ?> 
-            <button wire:click="create" class="flex items-center gap-1.5 rounded-full bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-dark" data-testid="add-tenant-button"><?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
+            <button type="button" wire:click="create" class="flex items-center gap-1.5 rounded-full bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-dark" data-testid="add-tenant-button"><?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce262628e3a8d44dc38fd1f3965181bc = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon','data' => ['name' => 'plus','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('icon'); ?>
@@ -44,7 +44,7 @@
 
     <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $tenants; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $tenant): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white" data-testid="tenant-row-<?php echo e($tenant->id); ?>" wire:key="tenant-<?php echo e($tenant->id); ?>">
+            <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm" data-testid="tenant-row-<?php echo e($tenant->id); ?>" wire:key="tenant-<?php echo e($tenant->id); ?>">
                 <div class="relative h-28 bg-slate-200">
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($tenant->image_url): ?> <img src="<?php echo e($tenant->image_url); ?>" alt="" class="h-full w-full object-cover"> <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                     <span class="absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider <?php echo e(['pending' => 'bg-amber-400 text-amber-950', 'active' => 'bg-brand text-white', 'suspended' => 'bg-rose-500 text-white'][$tenant->status]); ?>" data-testid="tenant-status-<?php echo e($tenant->id); ?>"><?php echo e($tenant->status); ?></span>
@@ -58,12 +58,12 @@
                     </div>
                     <div class="mt-4 flex flex-wrap gap-2">
                         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($tenant->status !== 'active'): ?>
-                            <button wire:click="setStatus(<?php echo e($tenant->id); ?>, 'active')" class="rounded-full bg-brand px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-dark" data-testid="approve-tenant-<?php echo e($tenant->id); ?>"><?php echo e($tenant->status === 'pending' ? 'Setujui' : 'Aktifkan'); ?></button>
+                            <button type="button" wire:click="setStatus(<?php echo e($tenant->id); ?>, 'active')" class="rounded-full bg-brand px-3 py-1.5 text-xs font-bold text-white hover:bg-brand-dark" data-testid="approve-tenant-<?php echo e($tenant->id); ?>"><?php echo e($tenant->status === 'pending' ? 'Setujui' : 'Aktifkan'); ?></button>
                         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($tenant->status === 'active'): ?>
-                            <button wire:click="setStatus(<?php echo e($tenant->id); ?>, 'suspended')" wire:confirm="Tangguhkan tenant <?php echo e($tenant->name); ?>? Staf tidak bisa masuk panel." class="rounded-full border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-50" data-testid="suspend-tenant-<?php echo e($tenant->id); ?>">Tangguhkan</button>
+                            <button type="button" wire:click="setStatus(<?php echo e($tenant->id); ?>, 'suspended')" wire:confirm="Tangguhkan tenant <?php echo e($tenant->name); ?>? Staf tidak bisa masuk panel." class="rounded-full border border-rose-200 px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-50" data-testid="suspend-tenant-<?php echo e($tenant->id); ?>">Tangguhkan</button>
                         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
-                        <button wire:click="edit(<?php echo e($tenant->id); ?>)" class="rounded-full px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100" data-testid="edit-tenant-<?php echo e($tenant->id); ?>">Edit</button>
+                        <button type="button" wire:click="edit(<?php echo e($tenant->id); ?>)" class="rounded-full px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100" data-testid="edit-tenant-<?php echo e($tenant->id); ?>">Edit</button>
                     </div>
                 </div>
             </article>
@@ -71,11 +71,11 @@
     </div>
 
     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($showForm): ?>
-        <div class="fixed inset-0 z-40 flex items-end justify-center bg-slate-900/50 md:items-center md:p-6" data-testid="tenant-form-modal">
-            <form wire:submit="save" class="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-6 md:rounded-3xl">
+        <div class="fixed inset-0 z-40 flex items-end justify-center bg-slate-900/50 md:items-center md:p-6" wire:click.self="closeForm" data-testid="tenant-form-modal">
+            <form wire:submit="save" class="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl md:rounded-3xl">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-extrabold"><?php echo e($editingId ? 'Edit tenant' : 'Tenant baru'); ?></h2>
-                    <button type="button" wire:click="$set('showForm', false)" class="grid h-9 w-9 place-items-center rounded-full hover:bg-slate-100" data-testid="close-form-button"><?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
+                    <button type="button" wire:click="closeForm" class="grid h-9 w-9 place-items-center rounded-full hover:bg-slate-100" data-testid="close-form-button"><?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce262628e3a8d44dc38fd1f3965181bc = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon','data' => ['name' => 'x','class' => 'h-5 w-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('icon'); ?>
@@ -114,7 +114,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                     <textarea wire:model="description" rows="2" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-brand" data-testid="tenant-description-input"></textarea>
                 </label>
                 <p class="mt-3 text-xs text-slate-500">Tenant baru berstatus <b>pending</b> sampai disetujui. Tambahkan akun Tenant Admin di menu Pengguna.</p>
-                <button class="mt-6 w-full rounded-full bg-brand py-3 text-sm font-bold text-white hover:bg-brand-dark" data-testid="save-tenant-button">Simpan</button>
+                <button type="submit" class="mt-6 w-full rounded-full bg-brand py-3 text-sm font-bold text-white hover:bg-brand-dark" data-testid="save-tenant-button">Simpan</button>
             </form>
         </div>
     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>

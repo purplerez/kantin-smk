@@ -59,6 +59,7 @@ class CheckoutFlowTest extends TestCase
     public function test_simulated_qris_payment_confirms_all_orders(): void
     {
         $buyer = $this->buyer();
+        $this->actingAs($buyer);
         app(CartService::class)->add($this->productOf('kantin-bu-rina')->id);
         app(CartService::class)->add($this->productOf('jajan-corner')->id);
         Livewire::actingAs($buyer)->test(Checkout::class)->set('paymentMethod', 'qris')->call('placeOrder');
@@ -77,8 +78,10 @@ class CheckoutFlowTest extends TestCase
 
     public function test_cash_checkout_confirms_immediately_but_unpaid(): void
     {
+        $buyer = $this->buyer();
+        $this->actingAs($buyer);
         app(CartService::class)->add($this->productOf('kantin-bu-rina')->id);
-        Livewire::actingAs($this->buyer())->test(Checkout::class)->set('paymentMethod', 'cash')->call('placeOrder');
+        Livewire::actingAs($buyer)->test(Checkout::class)->set('paymentMethod', 'cash')->call('placeOrder');
 
         $order = Order::withoutGlobalScopes()->firstOrFail();
         $this->assertSame(OrderStatus::Confirmed, $order->status);
@@ -88,10 +91,12 @@ class CheckoutFlowTest extends TestCase
 
     public function test_checkout_rejects_unavailable_product(): void
     {
+        $buyer = $this->buyer();
+        $this->actingAs($buyer);
         $soldOut = Product::withoutGlobalScopes()->where('is_available_today', false)->firstOrFail();
         app(CartService::class)->add($soldOut->id);
 
-        Livewire::actingAs($this->buyer())->test(Checkout::class)
+        Livewire::actingAs($buyer)->test(Checkout::class)
             ->set('paymentMethod', 'qris')
             ->call('placeOrder')
             ->assertHasErrors('cart');
@@ -101,11 +106,13 @@ class CheckoutFlowTest extends TestCase
 
     public function test_buyer_can_cancel_pending_order_and_cannot_see_others(): void
     {
+        $buyer = $this->buyer();
+        $this->actingAs($buyer);
         app(CartService::class)->add($this->productOf('kantin-bu-rina')->id);
-        Livewire::actingAs($this->buyer())->test(Checkout::class)->set('paymentMethod', 'transfer')->call('placeOrder');
+        Livewire::actingAs($buyer)->test(Checkout::class)->set('paymentMethod', 'transfer')->call('placeOrder');
         $order = Order::withoutGlobalScopes()->firstOrFail();
 
-        Livewire::actingAs($this->buyer())->test(OrderDetail::class, ['order' => $order])->call('cancel');
+        Livewire::actingAs($buyer)->test(OrderDetail::class, ['order' => $order])->call('cancel');
         $order->refresh();
         $this->assertSame(OrderStatus::Cancelled, $order->status);
         $this->assertSame(PaymentStatus::Cancelled, $order->invoice->payment_status, 'invoice ikut batal');

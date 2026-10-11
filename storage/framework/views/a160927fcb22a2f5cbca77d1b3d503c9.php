@@ -11,8 +11,8 @@
 <?php $component->withAttributes(['title' => 'Kelola pengguna','eyebrow' => 'Provisioning akun']); ?>
          <?php $__env->slot('actions', null, []); ?> 
             <div class="flex gap-2">
-                <button wire:click="$toggle('showImport')" class="rounded-full border border-slate-300 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50" data-testid="import-users-button">Import massal</button>
-                <button wire:click="create" class="flex items-center gap-1.5 rounded-full bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-dark" data-testid="add-user-button"><?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
+                <button type="button" wire:click="toggleImport" class="rounded-full border border-slate-300 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50" data-testid="import-users-button">Import massal</button>
+                <button type="button" wire:click="create" class="flex items-center gap-1.5 rounded-full bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-dark" data-testid="add-user-button"><?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce262628e3a8d44dc38fd1f3965181bc = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon','data' => ['name' => 'plus','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('icon'); ?>
@@ -53,7 +53,7 @@
                     <p class="mt-1 text-xs text-slate-600">Bagikan ke pengguna agar mereka mengatur password sendiri. Kedaluwarsa otomatis & hanya bisa dipakai satu kali.</p>
                     <input readonly value="<?php echo e($activationLink); ?>" onclick="this.select()" class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-xs outline-none" data-testid="activation-link-input">
                 </div>
-                <button wire:click="$set('activationLink','')" class="shrink-0 text-xs font-semibold text-slate-500 hover:text-slate-700" data-testid="dismiss-activation-link">Tutup</button>
+                <button type="button" wire:click="dismissActivationLink" class="shrink-0 text-xs font-semibold text-slate-500 hover:text-slate-700" data-testid="dismiss-activation-link">Tutup</button>
             </div>
         </div>
     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
@@ -72,7 +72,7 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
             <div class="mt-3 flex items-center gap-3">
-                <button class="rounded-full bg-slate-900 px-5 py-2.5 text-xs font-bold text-white" data-testid="import-submit-button">Proses import</button>
+                <button type="submit" class="rounded-full bg-slate-900 px-5 py-2.5 text-xs font-bold text-white hover:bg-slate-800" data-testid="import-submit-button">Proses import</button>
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($importResult): ?>
                     <span class="text-xs font-semibold text-brand-dark" data-testid="import-result"><?php echo e($importResult['created']); ?> dibuat, <?php echo e(count($importResult['skipped'])); ?> dilewati</span>
                 <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
@@ -113,7 +113,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
         </select>
     </div>
 
-    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
         <table class="w-full min-w-[720px] text-sm">
             <thead class="bg-slate-50 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 <tr><th class="px-4 py-3">Nama</th><th class="px-4 py-3">Email / ID</th><th class="px-4 py-3">Peran</th><th class="px-4 py-3">Tenant</th><th class="px-4 py-3">Status</th><th class="px-4 py-3 text-right">Aksi</th></tr>
@@ -126,11 +126,11 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                         <td class="px-4 py-3"><span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold"><?php echo e($user->role->label()); ?></span></td>
                         <td class="px-4 py-3 text-slate-600"><?php echo e($user->tenant?->name ?? '—'); ?></td>
                         <td class="px-4 py-3">
-                            <button wire:click="toggleActive(<?php echo e($user->id); ?>)" <?php if($user->id === auth()->id()): echo 'disabled'; endif; ?> class="rounded-full px-2.5 py-1 text-[11px] font-bold <?php echo e($user->is_active ? 'bg-brand-light text-brand-dark' : 'bg-rose-100 text-rose-700'); ?> disabled:cursor-not-allowed" data-testid="toggle-active-<?php echo e($user->id); ?>"><?php echo e($user->is_active ? 'Aktif' : 'Nonaktif'); ?></button>
+                            <button type="button" wire:click="toggleActive(<?php echo e($user->id); ?>)" <?php if($user->id === auth()->id()): echo 'disabled'; endif; ?> class="rounded-full px-2.5 py-1 text-[11px] font-bold <?php echo e($user->is_active ? 'bg-brand-light text-brand-dark' : 'bg-rose-100 text-rose-700'); ?> disabled:cursor-not-allowed" data-testid="toggle-active-<?php echo e($user->id); ?>"><?php echo e($user->is_active ? 'Aktif' : 'Nonaktif'); ?></button>
                         </td>
                         <td class="px-4 py-3 text-right">
-                            <button wire:click="generateLink(<?php echo e($user->id); ?>)" class="rounded-full px-3 py-1.5 text-xs font-bold text-brand-dark hover:bg-brand-light" data-testid="activation-link-<?php echo e($user->id); ?>">Aktivasi</button>
-                            <button wire:click="edit(<?php echo e($user->id); ?>)" class="rounded-full px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100" data-testid="edit-user-<?php echo e($user->id); ?>">Edit</button>
+                            <button type="button" wire:click="generateLink(<?php echo e($user->id); ?>)" class="rounded-full px-3 py-1.5 text-xs font-bold text-brand-dark hover:bg-brand-light" data-testid="activation-link-<?php echo e($user->id); ?>">Aktivasi</button>
+                            <button type="button" wire:click="edit(<?php echo e($user->id); ?>)" class="rounded-full px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100" data-testid="edit-user-<?php echo e($user->id); ?>">Edit</button>
                         </td>
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
@@ -140,11 +140,11 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
     <div class="mt-4"><?php echo e($users->links()); ?></div>
 
     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($showForm): ?>
-        <div class="fixed inset-0 z-40 flex items-end justify-center bg-slate-900/50 md:items-center md:p-6" data-testid="user-form-modal">
-            <form wire:submit="save" class="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-6 md:rounded-3xl">
+        <div class="fixed inset-0 z-40 flex items-end justify-center bg-slate-900/50 md:items-center md:p-6" wire:click.self="closeForm" data-testid="user-form-modal">
+            <form wire:submit="save" class="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl md:rounded-3xl">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-extrabold"><?php echo e($editingId ? 'Edit akun' : 'Akun baru'); ?></h2>
-                    <button type="button" wire:click="$set('showForm', false)" class="grid h-9 w-9 place-items-center rounded-full hover:bg-slate-100" data-testid="close-form-button"><?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
+                    <button type="button" wire:click="closeForm" class="grid h-9 w-9 place-items-center rounded-full hover:bg-slate-100" data-testid="close-form-button"><?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce262628e3a8d44dc38fd1f3965181bc = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon','data' => ['name' => 'x','class' => 'h-5 w-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('icon'); ?>
@@ -197,7 +197,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $r): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?> <option value="<?php echo e($r->value); ?>"><?php echo e($r->label()); ?></option> <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         </select>
                     </label>
-                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(\App\Enums\Role::from($role)->isTenant()): ?>
+                    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(\App\Enums\Role::tryFrom($role)?->isTenant()): ?>
                         <label class="block text-xs font-bold">Tenant
                             <select wire:model="tenant_id" class="mt-1.5 w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-brand" data-testid="user-tenant-select">
                                 <option value="">— Pilih —</option>
@@ -222,7 +222,7 @@ $message = $__bag->first($__errorArgs[0]); ?><span class="text-xs font-normal te
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?></label>
-                <button class="mt-6 w-full rounded-full bg-brand py-3 text-sm font-bold text-white hover:bg-brand-dark" data-testid="save-user-button">Simpan</button>
+                <button type="submit" class="mt-6 w-full rounded-full bg-brand py-3 text-sm font-bold text-white hover:bg-brand-dark" data-testid="save-user-button">Simpan</button>
             </form>
         </div>
     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>

@@ -37,6 +37,7 @@ class OrderStatusService
             'order' => $order->code,
             'status' => $next->label(),
         ]);
+        Realtime::orderUpdated($order, 'status');
 
         return $order;
     }
@@ -59,6 +60,7 @@ class OrderStatusService
                 'refund' => $refunded,
                 'reason' => $reason,
             ]);
+            Realtime::orderUpdated($order, 'cancelled');
         });
 
         return $order;
@@ -75,6 +77,7 @@ class OrderStatusService
                 'order' => $order->code,
                 'amount' => $order->subtotal,
             ]);
+            Realtime::orderUpdated($order, 'payment');
         });
 
         return $order;

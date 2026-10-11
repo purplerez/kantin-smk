@@ -45,22 +45,38 @@ class Tenants extends Component
     public function create(): void
     {
         $this->reset('editingId', 'name', 'description', 'image_url', 'bank_name', 'bank_account', 'bank_holder');
+        $this->resetValidation();
         $this->showForm = true;
+    }
+
+    public function closeForm(): void
+    {
+        $this->showForm = false;
+        $this->resetValidation();
     }
 
     public function edit(int $id): void
     {
         $tenant = Tenant::findOrFail($id);
         $this->editingId = $tenant->id;
-        foreach (['name', 'description', 'image_url', 'bank_name', 'bank_account', 'bank_holder'] as $f) {
-            $this->{$f} = (string) $tenant->{$f};
-        }
+        $this->name = (string) $tenant->name;
+        $this->description = (string) $tenant->description;
+        $this->image_url = (string) $tenant->image_url;
+        $this->bank_name = (string) $tenant->bank_name;
+        $this->bank_account = (string) $tenant->bank_account;
+        $this->bank_holder = (string) $tenant->bank_holder;
+        $this->resetValidation();
         $this->showForm = true;
     }
 
     public function save(): void
     {
         $data = $this->validate();
+        $data['description'] = $data['description'] ?: null;
+        $data['image_url'] = $data['image_url'] ?: null;
+        $data['bank_name'] = $data['bank_name'] ?: null;
+        $data['bank_account'] = $data['bank_account'] ?: null;
+        $data['bank_holder'] = $data['bank_holder'] ?: null;
 
         if ($this->editingId) {
             $tenant = Tenant::findOrFail($this->editingId);

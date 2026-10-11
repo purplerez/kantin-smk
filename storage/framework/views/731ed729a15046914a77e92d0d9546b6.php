@@ -10,7 +10,7 @@
 <?php endif; ?>
 <?php $component->withAttributes(['title' => 'Kelola menu','eyebrow' => 'Katalog tenant']); ?>
          <?php $__env->slot('actions', null, []); ?> 
-            <button wire:click="create" class="flex items-center gap-1.5 rounded-full bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-dark" data-testid="add-menu-button"><?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
+            <button type="button" wire:click="create" class="flex items-center gap-1.5 rounded-full bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-dark" data-testid="add-menu-button"><?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce262628e3a8d44dc38fd1f3965181bc = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon','data' => ['name' => 'plus','class' => 'h-4 w-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('icon'); ?>
@@ -88,7 +88,7 @@
 <?php unset($__componentOriginal074a021b9d42f490272b5eefda63257c); ?>
 <?php endif; ?>
     <?php else: ?>
-        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <table class="w-full text-sm">
                 <thead class="bg-slate-50 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                     <tr><th class="px-4 py-3">Menu</th><th class="hidden px-4 py-3 md:table-cell">Kategori</th><th class="px-4 py-3">Harga</th><th class="px-4 py-3">Tersedia</th><th class="px-4 py-3 text-right">Aksi</th></tr>
@@ -105,13 +105,13 @@
                             <td class="hidden px-4 py-3 text-slate-600 md:table-cell"><?php echo e($product->category?->name ?? '—'); ?></td>
                             <td class="px-4 py-3 font-semibold"><?php echo 'Rp'.number_format((int) ($product->price), 0, ',', '.'); ?></td>
                             <td class="px-4 py-3">
-                                <button wire:click="toggleAvailability(<?php echo e($product->id); ?>)" class="relative inline-flex h-6 w-11 items-center rounded-full transition <?php echo e($product->is_available_today ? 'bg-brand' : 'bg-slate-300'); ?>" data-testid="toggle-availability-<?php echo e($product->id); ?>" role="switch" aria-checked="<?php echo e($product->is_available_today ? 'true' : 'false'); ?>">
+                                <button type="button" wire:click="toggleAvailability(<?php echo e($product->id); ?>)" class="relative inline-flex h-6 w-11 items-center rounded-full transition <?php echo e($product->is_available_today ? 'bg-brand' : 'bg-slate-300'); ?>" data-testid="toggle-availability-<?php echo e($product->id); ?>" role="switch" aria-checked="<?php echo e($product->is_available_today ? 'true' : 'false'); ?>">
                                     <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition <?php echo e($product->is_available_today ? 'translate-x-5' : 'translate-x-0.5'); ?>"></span>
                                 </button>
                             </td>
                             <td class="px-4 py-3 text-right">
-                                <button wire:click="edit(<?php echo e($product->id); ?>)" class="rounded-full px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100" data-testid="edit-product-<?php echo e($product->id); ?>">Edit</button>
-                                <button wire:click="delete(<?php echo e($product->id); ?>)" wire:confirm="Hapus menu <?php echo e($product->name); ?>?" class="rounded-full px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-50" data-testid="delete-product-<?php echo e($product->id); ?>">Hapus</button>
+                                <button type="button" wire:click="edit(<?php echo e($product->id); ?>)" class="rounded-full px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100" data-testid="edit-product-<?php echo e($product->id); ?>">Edit</button>
+                                <button type="button" wire:click="delete(<?php echo e($product->id); ?>)" wire:confirm="Hapus menu <?php echo e($product->name); ?>?" class="rounded-full px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-50" data-testid="delete-product-<?php echo e($product->id); ?>">Hapus</button>
                             </td>
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
@@ -122,11 +122,11 @@
 
     
     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($showForm): ?>
-        <div class="fixed inset-0 z-40 flex items-end justify-center bg-slate-900/50 p-0 md:items-center md:p-6" data-testid="product-form-modal">
-            <form wire:submit="save" class="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-6 md:rounded-3xl">
+        <div class="fixed inset-0 z-40 flex items-end justify-center bg-slate-900/50 p-0 md:items-center md:p-6" wire:click.self="closeForm" data-testid="product-form-modal">
+            <form wire:submit="save" class="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white p-6 shadow-2xl md:rounded-3xl">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-extrabold"><?php echo e($editingId ? 'Edit menu' : 'Tambah menu'); ?></h2>
-                    <button type="button" wire:click="$set('showForm', false)" class="grid h-9 w-9 place-items-center rounded-full hover:bg-slate-100" data-testid="close-form-button"><?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
+                    <button type="button" wire:click="closeForm" class="grid h-9 w-9 place-items-center rounded-full hover:bg-slate-100" data-testid="close-form-button"><?php if (isset($component)) { $__componentOriginalce262628e3a8d44dc38fd1f3965181bc = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalce262628e3a8d44dc38fd1f3965181bc = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon','data' => ['name' => 'x','class' => 'h-5 w-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('icon'); ?>
@@ -194,7 +194,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
                 </label>
                 <label class="mt-4 flex items-center gap-2 text-sm"><input type="checkbox" wire:model="is_available_today" class="h-4 w-4 accent-brand" data-testid="product-available-checkbox"> Tersedia hari ini</label>
 
-                <button class="mt-6 w-full rounded-full bg-brand py-3 text-sm font-bold text-white hover:bg-brand-dark" data-testid="save-product-button">Simpan</button>
+                <button type="submit" class="mt-6 w-full rounded-full bg-brand py-3 text-sm font-bold text-white hover:bg-brand-dark" data-testid="save-product-button">Simpan</button>
             </form>
         </div>
     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>

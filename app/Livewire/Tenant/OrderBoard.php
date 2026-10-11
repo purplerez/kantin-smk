@@ -28,13 +28,13 @@ class OrderBoard extends Component
 
     public int $tenantId;
 
-    /** Batas waktu terakhir pengecekan pesanan baru (ISO 8601). */
-    public string $since;
+    /** ID pesanan terkonfirmasi yang sudah pernah dinotifikasikan. */
+    public array $seenConfirmedIds = [];
 
     public function mount(): void
     {
         $this->tenantId = (int) auth()->user()->tenant_id;
-        $this->since = now()->toIso8601String();
+        $this->seenConfirmedIds = Order::where('status', OrderStatus::Confirmed)->pluck('id')->all();
     }
 
     /** Push instan dari Reverb (kanal privat tenant). */
@@ -47,13 +47,15 @@ class OrderBoard extends Component
     /** Fallback polling: deteksi pesanan yang baru dikonfirmasi (sudah bayar / tunai) sejak pengecekan terakhir. */
     public function tick(): void
     {
-        $fresh = Order::with('buyer')->where('status', OrderStatus::Confirmed)->where('confirmed_at', '>', $this->since)->get();
+        $fresh = Order::with('buyer')
+            ->where('status', OrderStatus::Confirmed)
+            ->whereNotIn('id', $this->seenConfirmedIds)
+            ->get();
 
         if ($fresh->isNotEmpty()) {
+            $this->seenConfirmedIds = array_values(array_unique(array_merge($this->seenConfirmedIds, $fresh->pluck('id')->all())));
             $this->dispatch('new-order', count: $fresh->count(), text: $fresh->map(fn ($o) => $o->buyer->name.' · '.$o->code)->implode(', '));
         }
-
-        $this->since = now()->toIso8601String();
     }
 
     public function setStatus(string $status): void

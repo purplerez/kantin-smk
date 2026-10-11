@@ -48,7 +48,7 @@
 
     <div class="no-scrollbar -mx-4 mb-5 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $tabs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-            <button wire:click="setStatus('<?php echo e($key); ?>')" class="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition <?php echo e($status === $key ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'); ?>" data-testid="status-tab-<?php echo e($key); ?>">
+            <button type="button" wire:click="setStatus('<?php echo e($key); ?>')" class="flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition <?php echo e($status === $key ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'); ?>" data-testid="status-tab-<?php echo e($key); ?>">
                 <?php echo e($label); ?>
 
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(isset($counts[$key]) && $counts[$key] > 0): ?> <span class="rounded-full px-1.5 text-[10px] <?php echo e($status === $key ? 'bg-white/20' : 'bg-brand-light text-brand-dark'); ?>"><?php echo e($counts[$key]); ?></span> <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
@@ -122,18 +122,18 @@
 
                     <div class="mt-3 flex flex-wrap gap-2">
                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('advance', $order)): ?>
-                            <button wire:click="advance(<?php echo e($order->id); ?>)" wire:loading.attr="disabled" class="flex-1 rounded-full bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-dark disabled:opacity-60" data-testid="advance-order-<?php echo e($order->id); ?>-button">
+                            <button type="button" wire:click="advance(<?php echo e($order->id); ?>)" wire:loading.attr="disabled" class="flex-1 rounded-full bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-dark disabled:opacity-60" data-testid="advance-order-<?php echo e($order->id); ?>-button">
                                 Tandai <?php echo e($order->status->next()?->label()); ?>
 
                             </button>
                         <?php endif; ?>
                         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(! $order->isPaid() && ! $order->status->isFinal()): ?>
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('verifyPayment', $order)): ?>
-                                <button wire:click="markPaid(<?php echo e($order->id); ?>)" wire:confirm="Konfirmasi pembayaran tunai diterima?" class="rounded-full border border-brand px-4 py-2.5 text-xs font-bold text-brand-dark hover:bg-brand-light" data-testid="mark-paid-<?php echo e($order->id); ?>-button">Terima bayar</button>
+                                <button type="button" wire:click="markPaid(<?php echo e($order->id); ?>)" wire:confirm="Konfirmasi pembayaran tunai diterima?" class="rounded-full border border-brand px-4 py-2.5 text-xs font-bold text-brand-dark hover:bg-brand-light" data-testid="mark-paid-<?php echo e($order->id); ?>-button">Terima bayar</button>
                             <?php endif; ?>
                         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('cancel', $order)): ?>
-                            <button wire:click="cancel(<?php echo e($order->id); ?>)" wire:confirm="Batalkan pesanan <?php echo e($order->code); ?>?" class="rounded-full px-3 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50" data-testid="cancel-order-<?php echo e($order->id); ?>-button">Batalkan</button>
+                            <button type="button" wire:click="cancel(<?php echo e($order->id); ?>)" wire:confirm="Batalkan pesanan <?php echo e($order->code); ?>?" class="rounded-full px-3 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50" data-testid="cancel-order-<?php echo e($order->id); ?>-button">Batalkan</button>
                         <?php endif; ?>
                     </div>
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__errorArgs = ['status'];

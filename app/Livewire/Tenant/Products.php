@@ -51,7 +51,14 @@ class Products extends Component
         $this->authorize('create', Product::class);
         $this->reset('editingId', 'name', 'description', 'price', 'category_id', 'image_url');
         $this->is_available_today = true;
+        $this->resetValidation();
         $this->showForm = true;
+    }
+
+    public function closeForm(): void
+    {
+        $this->showForm = false;
+        $this->resetValidation();
     }
 
     public function edit(int $id): void

@@ -3,7 +3,7 @@
         <x-slot:actions>
             <div class="flex items-center gap-2">
                 <input type="date" wire:model.live="date" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm" data-testid="settlement-date">
-                <button wire:click="generate" class="rounded-full bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-dark" data-testid="generate-settlement-button">Generate</button>
+                <button type="button" wire:click="generate" class="rounded-full bg-brand px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-dark" data-testid="generate-settlement-button">Generate</button>
             </div>
         </x-slot:actions>
     </x-page-header>

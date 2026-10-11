@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Tenant;
 use App\Services\CartService;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -21,9 +22,13 @@ class Catalog extends Component
     #[Url(as: 'kategori')]
     public string $category = '';
 
-    public function addToCart(int $productId, CartService $cart): void
+    #[On('cart-updated')]
+    public function onCartUpdated(): void {}
+
+    public function addToCart(int $productId): void
     {
-        $product = Product::with('tenant')->find($productId);
+        $cart = app(CartService::class);
+        $product = Product::withoutGlobalScopes()->with('tenant')->find($productId);
 
         if (! $product || ! $product->isSellable()) {
             $this->dispatch('toast', message: 'Menu ini sedang tidak tersedia.', tone: 'error');
@@ -36,8 +41,22 @@ class Catalog extends Component
         $this->dispatch('toast', message: "{$product->name} ditambahkan ke keranjang");
     }
 
+    public function removeFromCart(int $productId): void
+    {
+        $cart = app(CartService::class);
+        $items = $cart->all();
+        $current = $items[$productId]['qty'] ?? 0;
+        if ($current <= 1) {
+            $cart->remove($productId);
+        } else {
+            $cart->setQty($productId, $current - 1);
+        }
+        $this->dispatch('cart-updated');
+    }
+
     public function render()
     {
+        $cart = app(CartService::class);
         $products = Product::query()
             ->with(['tenant', 'category'])
             ->whereHas('tenant', fn ($t) => $t->where('status', Tenant::STATUS_ACTIVE))
@@ -53,6 +72,9 @@ class Catalog extends Component
             'products' => $products,
             'categories' => Category::orderBy('sort_order')->get(),
             'tenants' => Tenant::where('status', Tenant::STATUS_ACTIVE)->withCount('products')->orderBy('name')->get(),
+            'cartItems' => $cart->all(),
+            'cartCount' => $cart->count(),
+            'cartTotal' => $cart->total(),
         ]);
     }
 }

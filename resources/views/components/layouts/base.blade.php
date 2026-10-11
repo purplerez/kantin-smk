@@ -39,9 +39,19 @@
 
     {{-- Toast ringan (Alpine, bawaan Livewire) --}}
     <div x-data="{ show: false, message: '', tone: 'ok' }"
-         x-on:toast.window="message = $event.detail.message; tone = $event.detail.tone ?? 'ok'; show = true; clearTimeout(window.__t); window.__t = setTimeout(() => show = false, 2600)"
+         x-on:toast.window="
+            const d = $event.detail;
+            const p = Array.isArray(d) ? d[0] : d;
+            message = (typeof p === 'object' && p !== null) ? (p.message ?? '') : (p ?? '');
+            tone = (typeof p === 'object' && p !== null) ? (p.tone ?? 'ok') : 'ok';
+            if (message) {
+                show = true;
+                clearTimeout(window.__t);
+                window.__t = setTimeout(() => show = false, 2800);
+            }
+         "
          x-show="show" x-cloak x-transition
-         class="fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-lg"
+         class="fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-lg pointer-events-none"
          :class="tone === 'ok' ? 'bg-slate-900' : 'bg-rose-600'"
          data-testid="toast">
         <span x-text="message"></span>
@@ -49,24 +59,57 @@
 
     <x-pickup-alert />
 
+    {{-- Echo safety guard: pastikan window.Echo.socketId selalu berupa fungsi agar Livewire tidak crash --}}
+    <script>
+        (() => {
+            let _echo = window.Echo;
+            Object.defineProperty(window, 'Echo', {
+                configurable: true,
+                enumerable: true,
+                get() { return _echo; },
+                set(val) {
+                    _echo = val;
+                    if (_echo && typeof _echo.socketId !== 'function') {
+                        _echo.socketId = () => undefined;
+                    }
+                }
+            });
+            if (_echo && typeof _echo.socketId !== 'function') {
+                _echo.socketId = () => undefined;
+            }
+        })();
+    </script>
+
+    @livewireScripts
+
     {{-- [JS #5] Laravel Echo + Pusher protocol client (CDN) untuk menerima push dari Laravel Reverb. Hanya dimuat bila BROADCAST_CONNECTION=reverb. --}}
     @if (\App\Services\Realtime::enabled())
         @php($rv = config('broadcasting.connections.reverb.options'))
-        <script src="https://cdn.jsdelivr.net/npm/pusher-js@8.4.0/dist/web/pusher.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.1/dist/echo.iife.js"></script>
-        <script>
-            window.Pusher = Pusher;
-            window.Echo = new Echo({
-                broadcaster: 'reverb',
-                key: @json(config('broadcasting.connections.reverb.key')),
-                wsHost: @json($rv['host']),
-                wsPort: @json((int) $rv['port']),
-                wssPort: @json((int) $rv['port']),
-                forceTLS: @json(($rv['scheme'] ?? 'http') === 'https'),
-                enabledTransports: ['ws', 'wss'],
-                authEndpoint: '/broadcasting/auth',
-                csrfToken: document.querySelector('meta[name="csrf-token"]').content,
-            });
+        <script data-navigate-once src="https://cdn.jsdelivr.net/npm/pusher-js@8.4.0/dist/web/pusher.min.js"></script>
+        <script data-navigate-once src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.1/dist/echo.iife.js"></script>
+        <script data-navigate-once>
+            try {
+                if (typeof Pusher !== 'undefined' && typeof Echo !== 'undefined') {
+                    window.Pusher = Pusher;
+                    const echoInst = new Echo({
+                        broadcaster: 'reverb',
+                        key: @json(config('broadcasting.connections.reverb.key')),
+                        wsHost: @json($rv['host']),
+                        wsPort: @json((int) $rv['port']),
+                        wssPort: @json((int) $rv['port']),
+                        forceTLS: @json(($rv['scheme'] ?? 'http') === 'https'),
+                        enabledTransports: ['ws', 'wss'],
+                        authEndpoint: '/broadcasting/auth',
+                        csrfToken: document.querySelector('meta[name="csrf-token"]')?.content,
+                    });
+                    if (typeof echoInst.socketId !== 'function') {
+                        echoInst.socketId = () => undefined;
+                    }
+                    window.Echo = echoInst;
+                }
+            } catch (e) {
+                console.warn('Echo/Reverb connection skipped:', e);
+            }
         </script>
     @endif
 
@@ -76,7 +119,5 @@
             window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
         }
     </script>
-
-    @livewireScripts
 </body>
 </html>

@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('login', function (Request $request) {
             $key = Str::lower((string) $request->input('email')).'|'.$request->ip();
 
-            return [Limit::perMinute(10)->by($key)];
+            return [Limit::perMinute(5)->by($key)];
         });
 
         // @rupiah(15000) => Rp15.000

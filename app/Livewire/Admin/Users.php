@@ -60,7 +60,7 @@ class Users extends Component
             'email' => ['required', 'email', 'max:120', Rule::unique('users', 'email')->ignore($this->editingId)],
             'identifier' => ['nullable', 'string', 'max:30', Rule::unique('users', 'identifier')->ignore($this->editingId)],
             'role' => ['required', new Enum(Role::class)],
-            'tenant_id' => [Rule::requiredIf(fn () => Role::from($this->role)->isTenant()), 'nullable', 'exists:tenants,id'],
+            'tenant_id' => [Rule::requiredIf(fn () => Role::tryFrom($this->role)?->isTenant() ?? false), 'nullable', 'exists:tenants,id'],
             'password' => ['nullable', 'string', 'min:6', 'max:64'],
         ];
     }
@@ -79,7 +79,24 @@ class Users extends Component
     {
         $this->reset('editingId', 'name', 'email', 'identifier', 'tenant_id', 'password', 'activationLink');
         $this->role = 'user';
+        $this->resetValidation();
         $this->showForm = true;
+    }
+
+    public function toggleImport(): void
+    {
+        $this->showImport = ! $this->showImport;
+    }
+
+    public function closeForm(): void
+    {
+        $this->showForm = false;
+        $this->resetValidation();
+    }
+
+    public function dismissActivationLink(): void
+    {
+        $this->activationLink = '';
     }
 
     public function edit(int $id): void
@@ -92,6 +109,7 @@ class Users extends Component
         $this->role = $user->role->value;
         $this->tenant_id = $user->tenant_id;
         $this->password = '';
+        $this->resetValidation();
         $this->showForm = true;
     }
 

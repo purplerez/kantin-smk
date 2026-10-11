@@ -105,7 +105,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('notifications-bell', []);
 
-$__key = null;
+$__key = 'panel-bell-desktop';
 
 $__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-3208482325-0', $__key);
 
@@ -159,7 +159,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('notifications-bell', []);
 
-$__key = null;
+$__key = 'panel-bell-mobile';
 
 $__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-3208482325-1', $__key);
 

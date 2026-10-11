@@ -124,6 +124,8 @@ class CheckoutService
                         'amount' => $order->subtotal,
                     ]);
                 }
+
+                Realtime::orderUpdated($order, 'created');
             }
 
             // Kosongkan keranjang di dalam transaction yang sama.
@@ -170,6 +172,8 @@ class CheckoutService
                     'buyer' => $order->buyer->name ?? '—',
                     'amount' => $order->subtotal,
                 ]);
+
+                Realtime::orderUpdated($order, 'payment');
             });
 
             $this->notifications->notifyUser((int) $invoice->buyer_id, 'payment.received', [

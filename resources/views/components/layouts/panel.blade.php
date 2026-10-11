@@ -42,7 +42,7 @@
                         <div class="truncate text-sm font-bold">{{ $user->name }}</div>
                         <div class="text-xs text-slate-500">{{ $user->role->label() }}</div>
                     </div>
-                    <livewire:notifications-bell />
+                    <livewire:notifications-bell key="panel-bell-desktop" />
                     <x-sound-toggle />
                 </div>
                 <form method="POST" action="{{ route('logout') }}" class="mt-3">
@@ -57,7 +57,7 @@
             <header class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-slate-200 bg-white px-4 md:hidden">
                 <span class="grid h-8 w-8 place-items-center rounded-lg bg-brand text-base font-extrabold text-white">K</span>
                 <div class="flex-1 truncate text-sm font-bold">{{ $user->isAdmin() ? 'Platform Control' : $user->tenant?->name }}</div>
-                <livewire:notifications-bell />
+                <livewire:notifications-bell key="panel-bell-mobile" />
                 <x-sound-toggle data-testid="sound-toggle-mobile" />
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

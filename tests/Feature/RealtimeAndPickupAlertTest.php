@@ -20,8 +20,10 @@ class RealtimeAndPickupAlertTest extends TestCase
 {
     private function placeRinaOrder(string $method = 'cash'): Order
     {
+        $buyer = $this->buyer();
+        $this->actingAs($buyer);
         app(CartService::class)->add(Product::withoutGlobalScopes()->where('tenant_id', $this->tenantRina()->id)->where('is_available_today', true)->first()->id);
-        Livewire::actingAs($this->buyer())->test(Checkout::class)->set('paymentMethod', $method)->call('placeOrder');
+        Livewire::actingAs($buyer)->test(Checkout::class)->set('paymentMethod', $method)->call('placeOrder');
 
         return Order::withoutGlobalScopes()->latest('id')->firstOrFail();
     }
@@ -111,13 +113,16 @@ class RealtimeAndPickupAlertTest extends TestCase
 
         // Setelah dibayar -> confirmed -> alert
         app(CheckoutService::class)->markInvoicePaid($pending->invoice);
+        $this->actingAs($this->staff());
         $board->call('onOrderUpdated')->assertDispatched('new-order', count: 1);
         $board->call('tick')->assertNotDispatched('new-order');
 
         // Tunai -> langsung confirmed -> alert; order tenant lain tidak memicu
         $this->placeRinaOrder('cash');
+        $this->actingAs($this->buyer());
         app(CartService::class)->add(Product::withoutGlobalScopes()->where('tenant_id', $this->tenantKopsis()->id)->first()->id);
         Livewire::actingAs($this->buyer())->test(Checkout::class)->set('paymentMethod', 'cash')->call('placeOrder');
+        $this->actingAs($this->staff());
         $board->call('tick')->assertDispatched('new-order', count: 1);
     }
 }

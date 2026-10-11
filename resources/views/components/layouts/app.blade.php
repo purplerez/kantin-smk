@@ -14,9 +14,15 @@
                 <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand text-lg font-extrabold text-white">K</span>
                 <span class="text-lg font-extrabold tracking-tight">Kantin<span class="text-brand">SMK</span> Go</span>
             </a>
-            <div class="ml-auto flex items-center gap-1 md:hidden">
-                <livewire:notifications-bell />
+            <div class="ml-auto flex items-center gap-1.5 md:hidden">
+                <livewire:notifications-bell key="app-bell-mobile" />
                 <x-sound-toggle data-testid="sound-toggle-mobile" />
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-600 active:bg-rose-50 active:text-rose-600" data-testid="logout-button-mobile" title="Keluar">
+                        Keluar
+                    </button>
+                </form>
             </div>
             <nav class="ml-auto hidden items-center gap-1 md:flex">
                 @foreach ($nav as $item)
@@ -30,10 +36,18 @@
                 @endforeach
             </nav>
             <div class="hidden items-center gap-3 md:flex">
-                <livewire:notifications-bell />
+                <livewire:notifications-bell key="app-bell-desktop" />
                 <x-sound-toggle />
-                <span class="text-sm text-slate-500">{{ $user->name }}</span>
-                <span class="grid h-9 w-9 place-items-center rounded-full bg-accent/15 text-sm font-bold text-accent">{{ $user->initials() }}</span>
+                <div class="flex items-center gap-2 border-l border-slate-200 pl-3">
+                    <span class="grid h-8 w-8 place-items-center rounded-full bg-accent/15 text-xs font-bold text-accent">{{ $user->initials() }}</span>
+                    <span class="max-w-[130px] truncate text-xs font-bold text-slate-700">{{ $user->name }}</span>
+                    <form method="POST" action="{{ route('logout') }}" class="inline ml-1">
+                        @csrf
+                        <button type="submit" class="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600" data-testid="logout-button-desktop" title="Keluar dari akun">
+                            <span>Keluar</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>

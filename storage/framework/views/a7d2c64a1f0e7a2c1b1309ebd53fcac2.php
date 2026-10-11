@@ -51,14 +51,14 @@ unset($__defined_vars, $__key, $__value); ?>
                 <span class="grid h-9 w-9 place-items-center rounded-xl bg-brand text-lg font-extrabold text-white">K</span>
                 <span class="text-lg font-extrabold tracking-tight">Kantin<span class="text-brand">SMK</span> Go</span>
             </a>
-            <div class="ml-auto flex items-center gap-1 md:hidden">
+            <div class="ml-auto flex items-center gap-1.5 md:hidden">
                 <?php
 $__split = function ($name, $params = []) {
     return [$name, $params];
 };
 [$__name, $__params] = $__split('notifications-bell', []);
 
-$__key = null;
+$__key = 'app-bell-mobile';
 
 $__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-2511592866-0', $__key);
 
@@ -93,6 +93,12 @@ if (isset($__slots)) unset($__slots);
 <?php $component = $__componentOriginal3c7b84510759e52dbc6ba1a22c2f942e; ?>
 <?php unset($__componentOriginal3c7b84510759e52dbc6ba1a22c2f942e); ?>
 <?php endif; ?>
+                <form method="POST" action="<?php echo e(route('logout')); ?>" class="inline">
+                    <?php echo csrf_field(); ?>
+                    <button type="submit" class="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-600 active:bg-rose-50 active:text-rose-600" data-testid="logout-button-mobile" title="Keluar">
+                        Keluar
+                    </button>
+                </form>
             </div>
             <nav class="ml-auto hidden items-center gap-1 md:flex">
                 <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $nav; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -152,7 +158,7 @@ $__split = function ($name, $params = []) {
 };
 [$__name, $__params] = $__split('notifications-bell', []);
 
-$__key = null;
+$__key = 'app-bell-desktop';
 
 $__key ??= \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::generateKey('lw-2511592866-2', $__key);
 
@@ -187,8 +193,16 @@ if (isset($__slots)) unset($__slots);
 <?php $component = $__componentOriginal3c7b84510759e52dbc6ba1a22c2f942e; ?>
 <?php unset($__componentOriginal3c7b84510759e52dbc6ba1a22c2f942e); ?>
 <?php endif; ?>
-                <span class="text-sm text-slate-500"><?php echo e($user->name); ?></span>
-                <span class="grid h-9 w-9 place-items-center rounded-full bg-accent/15 text-sm font-bold text-accent"><?php echo e($user->initials()); ?></span>
+                <div class="flex items-center gap-2 border-l border-slate-200 pl-3">
+                    <span class="grid h-8 w-8 place-items-center rounded-full bg-accent/15 text-xs font-bold text-accent"><?php echo e($user->initials()); ?></span>
+                    <span class="max-w-[130px] truncate text-xs font-bold text-slate-700"><?php echo e($user->name); ?></span>
+                    <form method="POST" action="<?php echo e(route('logout')); ?>" class="inline ml-1">
+                        <?php echo csrf_field(); ?>
+                        <button type="submit" class="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600" data-testid="logout-button-desktop" title="Keluar dari akun">
+                            <span>Keluar</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>
