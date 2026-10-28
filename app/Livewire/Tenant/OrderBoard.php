@@ -109,7 +109,7 @@ class OrderBoard extends Component
         return view('livewire.tenant.order-board', [
             'orders' => $orders,
             'counts' => $counts,
-            'pollSeconds' => Realtime::enabled() ? 60 : 8,
+            'pollSeconds' => 6,
             'tabs' => [
                 'pending' => 'Belum bayar',
                 'confirmed' => 'Baru',

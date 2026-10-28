@@ -66,11 +66,17 @@ class OrderStatusService
         return $order;
     }
 
-    /** Tenant admin memverifikasi pembayaran tunai saat pembeli datang ke kasir. */
+    /** Tenant admin memverifikasi pembayaran saat pembeli datang ke kasir atau transfer dikonfirmasi. */
     public function markPaid(Order $order): Order
     {
         DB::transaction(function () use ($order) {
-            $order->update(['payment_status' => PaymentStatus::Paid]);
+            $updates = ['payment_status' => PaymentStatus::Paid];
+            if ($order->status === OrderStatus::Pending) {
+                $updates['status'] = OrderStatus::Confirmed;
+                $updates['confirmed_at'] = now();
+            }
+
+            $order->update($updates);
             $this->syncInvoice($order);
             AuditLogger::log('order.payment_verified', $order);
             $this->notifications->notifyUser((int) $order->buyer_id, 'payment.received', [

@@ -89,7 +89,7 @@ class OrderDetail extends Component
         return view('livewire.buyer.order-detail', [
             'timeline' => OrderStatus::timeline(),
             'currentIndex' => array_search($this->order->status, OrderStatus::timeline(), true),
-            'pollSeconds' => Realtime::enabled() ? 60 : 8,
+            'pollSeconds' => 6,
         ])->title('Pesanan '.$this->order->code);
     }
 }

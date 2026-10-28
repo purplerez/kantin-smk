@@ -84,6 +84,30 @@
         </div>
 
         <aside class="space-y-3 lg:sticky lg:top-24 lg:self-start">
+            @if ($order->invoice->orders->count() > 1)
+                <section class="rounded-2xl border border-slate-200 bg-white p-4 text-sm" data-testid="sibling-orders-card">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Order Lain dalam Invoice Ini</p>
+                    <div class="mt-2 space-y-2">
+                        @foreach ($order->invoice->orders as $sibling)
+                            @if ($sibling->id === $order->id)
+                                <div class="flex items-center justify-between rounded-xl bg-brand-light/50 p-2.5 text-xs font-semibold text-brand-dark">
+                                    <span>{{ $sibling->tenant->name }} (Sedang dibuka)</span>
+                                    <x-status-badge :status="$sibling->status" class="text-[10px]" />
+                                </div>
+                            @else
+                                <a href="{{ route('orders.show', $sibling) }}" wire:navigate class="flex items-center justify-between rounded-xl border border-slate-100 p-2.5 text-xs transition hover:border-brand hover:bg-slate-50">
+                                    <div class="text-left">
+                                        <strong class="block text-slate-800">{{ $sibling->tenant->name }}</strong>
+                                        <span class="text-[10px] text-slate-500">{{ $sibling->code }} · @rupiah($sibling->subtotal)</span>
+                                    </div>
+                                    <x-status-badge :status="$sibling->status" class="text-[10px]" />
+                                </a>
+                            @endif
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
             <section class="rounded-2xl border border-slate-200 bg-white p-4 text-sm">
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Pembayaran</p>
                 <dl class="mt-2 space-y-1.5">
@@ -96,7 +120,7 @@
             </section>
 
             @can('cancel', $order)
-                <button wire:click="cancel" wire:confirm="Batalkan pesanan ini?" class="w-full rounded-full border border-rose-200 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50" data-testid="cancel-order-button">Batalkan pesanan</button>
+                <button wire:click="cancel" wire:confirm="{{ $order->isPaid() ? 'Pesanan ini sudah dibayar. Jika dibatalkan, pengembalian dana dilakukan manual oleh pihak kantin. Yakin ingin membatalkan pesanan?' : 'Batalkan pesanan ini?' }}" class="w-full rounded-full border border-rose-200 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50" data-testid="cancel-order-button">Batalkan pesanan</button>
             @endcan
         </aside>
     </div>

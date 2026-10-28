@@ -134,4 +134,23 @@ class TenantOperationsTest extends TestCase
         Livewire::actingAs($this->owner())->test(Products::class)->call('delete', $product->id);
         $this->assertSoftDeleted($product);
     }
+
+    public function test_verifying_payment_on_pending_order_advances_status_to_confirmed(): void
+    {
+        $buyer = $this->buyer();
+        $this->actingAs($buyer);
+        $cart = app(CartService::class);
+        $cart->add(Product::withoutGlobalScopes()->where('tenant_id', $this->tenantRina()->id)->where('is_available_today', true)->first()->id);
+        Livewire::actingAs($buyer)->test(Checkout::class)->set('paymentMethod', 'transfer')->call('placeOrder');
+
+        $order = Order::withoutGlobalScopes()->where('tenant_id', $this->tenantRina()->id)->first();
+        $this->assertSame(OrderStatus::Pending, $order->status);
+        $this->assertSame(PaymentStatus::Pending, $order->payment_status);
+
+        Livewire::actingAs($this->owner())->test(OrderBoard::class)->call('markPaid', $order->id)->assertOk();
+
+        $order->refresh();
+        $this->assertSame(PaymentStatus::Paid, $order->payment_status);
+        $this->assertSame(OrderStatus::Confirmed, $order->status);
+    }
 }

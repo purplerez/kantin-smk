@@ -52,7 +52,9 @@
                         @endcan
                         @if (! $order->isPaid() && ! $order->status->isFinal())
                             @can('verifyPayment', $order)
-                                <button type="button" wire:click="markPaid({{ $order->id }})" wire:confirm="Konfirmasi pembayaran tunai diterima?" class="rounded-full border border-brand px-4 py-2.5 text-xs font-bold text-brand-dark hover:bg-brand-light" data-testid="mark-paid-{{ $order->id }}-button">Terima bayar</button>
+                                <button type="button" wire:click="markPaid({{ $order->id }})" wire:confirm="{{ $order->invoice->payment_method === \App\Enums\PaymentMethod::Transfer ? 'Konfirmasi transfer sudah masuk?' : 'Konfirmasi pembayaran tunai diterima?' }}" class="rounded-full border border-brand px-4 py-2.5 text-xs font-bold text-brand-dark hover:bg-brand-light" data-testid="mark-paid-{{ $order->id }}-button">Terima bayar</button>
+                            @else
+                                <span class="inline-flex items-center text-[11px] font-semibold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full" title="Menunggu verifikasi pembayaran oleh owner kantin">Menunggu bayar</span>
                             @endcan
                         @endif
                         @can('cancel', $order)

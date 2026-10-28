@@ -129,7 +129,9 @@
                         <?php endif; ?>
                         <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if(! $order->isPaid() && ! $order->status->isFinal()): ?>
                             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('verifyPayment', $order)): ?>
-                                <button type="button" wire:click="markPaid(<?php echo e($order->id); ?>)" wire:confirm="Konfirmasi pembayaran tunai diterima?" class="rounded-full border border-brand px-4 py-2.5 text-xs font-bold text-brand-dark hover:bg-brand-light" data-testid="mark-paid-<?php echo e($order->id); ?>-button">Terima bayar</button>
+                                <button type="button" wire:click="markPaid(<?php echo e($order->id); ?>)" wire:confirm="<?php echo e($order->invoice->payment_method === \App\Enums\PaymentMethod::Transfer ? 'Konfirmasi transfer sudah masuk?' : 'Konfirmasi pembayaran tunai diterima?'); ?>" class="rounded-full border border-brand px-4 py-2.5 text-xs font-bold text-brand-dark hover:bg-brand-light" data-testid="mark-paid-<?php echo e($order->id); ?>-button">Terima bayar</button>
+                            <?php else: ?>
+                                <span class="inline-flex items-center text-[11px] font-semibold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-full" title="Menunggu verifikasi pembayaran oleh owner kantin">Menunggu bayar</span>
                             <?php endif; ?>
                         <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                         <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('cancel', $order)): ?>

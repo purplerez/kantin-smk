@@ -24,9 +24,37 @@
     document.addEventListener('click', () => { try { window.__kantinAudio ??= new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }, { once: true });
 </script>
 
-<div x-data="{ items: [] }"
-     x-on:order-ready.window="items.unshift({ id: Date.now(), kind: 'ready', title: 'Pesanan siap diambil!', text: $event.detail.tenant + ' · ' + $event.detail.code, url: $event.detail.url }); window.kantinChime([[880, .16], [1175, .16], [1568, .38]]); setTimeout(() => items.pop(), 15000)"
-     x-on:new-order.window="items.unshift({ id: Date.now(), kind: 'new', title: $event.detail.count + ' pesanan baru masuk', text: $event.detail.text ?? 'Segera siapkan pesanan.', url: null }); window.kantinChime([[660, .12], [660, .12], [990, .3]]); setTimeout(() => items.pop(), 8000)"
+<div x-data="{
+        items: [],
+        addReady(e) {
+            const d = (Array.isArray(e.detail) ? e.detail[0] : e.detail) || {};
+            const id = Date.now() + Math.random();
+            this.items.unshift({
+                id,
+                kind: 'ready',
+                title: 'Pesanan siap diambil!',
+                text: (d.tenant || 'Tenant') + ' · ' + (d.code || ''),
+                url: d.url || null
+            });
+            window.kantinChime([[880, .16], [1175, .16], [1568, .38]]);
+            setTimeout(() => { this.items = this.items.filter(i => i.id !== id); }, 15000);
+        },
+        addNew(e) {
+            const d = (Array.isArray(e.detail) ? e.detail[0] : e.detail) || {};
+            const id = Date.now() + Math.random();
+            this.items.unshift({
+                id,
+                kind: 'new',
+                title: (d.count || 1) + ' pesanan baru masuk',
+                text: d.text || 'Segera siapkan pesanan.',
+                url: null
+            });
+            window.kantinChime([[660, .12], [660, .12], [990, .3]]);
+            setTimeout(() => { this.items = this.items.filter(i => i.id !== id); }, 8000);
+        }
+     }"
+     x-on:order-ready.window="addReady($event)"
+     x-on:new-order.window="addNew($event)"
      class="pointer-events-none fixed inset-x-0 bottom-20 z-50 flex flex-col items-center gap-2 px-4 md:bottom-6"
      data-testid="pickup-alert-stack">
     <template x-for="item in items" :key="item.id">

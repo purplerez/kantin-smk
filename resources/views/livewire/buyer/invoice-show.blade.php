@@ -17,6 +17,17 @@
                         <span class="grid h-16 w-16 place-items-center rounded-full bg-brand text-white"><x-icon name="check" class="h-8 w-8" /></span>
                         <p class="mt-3 text-sm font-semibold">Pembayaran diterima {{ $invoice->paid_at?->translatedFormat('d M Y H:i') }}</p>
                         <p class="text-xs text-slate-500">Pantau status pesananmu di bawah.</p>
+                        <div class="mt-4 flex flex-wrap justify-center gap-3">
+                            @if ($invoice->orders->count() === 1)
+                                <a href="{{ route('orders.show', $invoice->orders->first()) }}" wire:navigate class="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-brand/20 hover:bg-brand-dark" data-testid="track-order-button">
+                                    Pantau Pesanan Ini <x-icon name="forward" class="h-4 w-4" />
+                                </a>
+                            @else
+                                <a href="{{ route('orders') }}" wire:navigate class="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-2.5 text-xs font-bold text-white shadow-md shadow-brand/20 hover:bg-brand-dark" data-testid="track-order-button">
+                                    Lihat Daftar Pesanan <x-icon name="forward" class="h-4 w-4" />
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 @elseif ($method === \App\Enums\PaymentMethod::Qris)
                     <div class="mx-auto mt-6 w-56 rounded-2xl border-4 border-slate-900 bg-white p-3" data-testid="qris-code">
@@ -33,7 +44,18 @@
                     </div>
                 @else
                     <div class="mx-auto mt-6 max-w-xs rounded-2xl bg-slate-50 p-4 text-sm text-slate-600" data-testid="cash-panel">
-                        Tunjukkan kode pesanan ke kasir tenant dan bayar <strong>@rupiah($invoice->total)</strong> saat mengambil pesanan. Tenant akan menandai lunas.
+                        <p>Tunjukkan kode pesanan ke kasir tenant dan bayar <strong>@rupiah($invoice->total)</strong> saat mengambil pesanan. Tenant akan menandai lunas.</p>
+                        <div class="mt-4">
+                            @if ($invoice->orders->count() === 1)
+                                <a href="{{ route('orders.show', $invoice->orders->first()) }}" wire:navigate class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-slate-800" data-testid="track-order-button">
+                                    Lihat Status Pesanan <x-icon name="forward" class="h-3.5 w-3.5" />
+                                </a>
+                            @else
+                                <a href="{{ route('orders') }}" wire:navigate class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-slate-800" data-testid="track-order-button">
+                                    Lihat Semua Pesanan <x-icon name="forward" class="h-3.5 w-3.5" />
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 @endif
 

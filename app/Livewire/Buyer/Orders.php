@@ -77,7 +77,7 @@ class Orders extends Component
         return view('livewire.buyer.orders', [
             'orders' => $orders,
             'activeCount' => Order::where('buyer_id', $this->buyerId)->whereIn('status', $active)->count(),
-            'pollSeconds' => Realtime::enabled() ? 60 : 10,
+            'pollSeconds' => 6,
         ]);
     }
 }

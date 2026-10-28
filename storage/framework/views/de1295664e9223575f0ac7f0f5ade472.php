@@ -204,6 +204,68 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
         </div>
 
         <aside class="space-y-3 lg:sticky lg:top-24 lg:self-start">
+            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->invoice->orders->count() > 1): ?>
+                <section class="rounded-2xl border border-slate-200 bg-white p-4 text-sm" data-testid="sibling-orders-card">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Order Lain dalam Invoice Ini</p>
+                    <div class="mt-2 space-y-2">
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $order->invoice->orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $sibling): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($sibling->id === $order->id): ?>
+                                <div class="flex items-center justify-between rounded-xl bg-brand-light/50 p-2.5 text-xs font-semibold text-brand-dark">
+                                    <span><?php echo e($sibling->tenant->name); ?> (Sedang dibuka)</span>
+                                    <?php if (isset($component)) { $__componentOriginal8c81617a70e11bcf247c4db924ab1b62 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8c81617a70e11bcf247c4db924ab1b62 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.status-badge','data' => ['status' => $sibling->status,'class' => 'text-[10px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('status-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['status' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($sibling->status),'class' => 'text-[10px]']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8c81617a70e11bcf247c4db924ab1b62)): ?>
+<?php $attributes = $__attributesOriginal8c81617a70e11bcf247c4db924ab1b62; ?>
+<?php unset($__attributesOriginal8c81617a70e11bcf247c4db924ab1b62); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8c81617a70e11bcf247c4db924ab1b62)): ?>
+<?php $component = $__componentOriginal8c81617a70e11bcf247c4db924ab1b62; ?>
+<?php unset($__componentOriginal8c81617a70e11bcf247c4db924ab1b62); ?>
+<?php endif; ?>
+                                </div>
+                            <?php else: ?>
+                                <a href="<?php echo e(route('orders.show', $sibling)); ?>" wire:navigate class="flex items-center justify-between rounded-xl border border-slate-100 p-2.5 text-xs transition hover:border-brand hover:bg-slate-50">
+                                    <div class="text-left">
+                                        <strong class="block text-slate-800"><?php echo e($sibling->tenant->name); ?></strong>
+                                        <span class="text-[10px] text-slate-500"><?php echo e($sibling->code); ?> · <?php echo 'Rp'.number_format((int) ($sibling->subtotal), 0, ',', '.'); ?></span>
+                                    </div>
+                                    <?php if (isset($component)) { $__componentOriginal8c81617a70e11bcf247c4db924ab1b62 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8c81617a70e11bcf247c4db924ab1b62 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.status-badge','data' => ['status' => $sibling->status,'class' => 'text-[10px]']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('status-badge'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['status' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($sibling->status),'class' => 'text-[10px]']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8c81617a70e11bcf247c4db924ab1b62)): ?>
+<?php $attributes = $__attributesOriginal8c81617a70e11bcf247c4db924ab1b62; ?>
+<?php unset($__attributesOriginal8c81617a70e11bcf247c4db924ab1b62); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8c81617a70e11bcf247c4db924ab1b62)): ?>
+<?php $component = $__componentOriginal8c81617a70e11bcf247c4db924ab1b62; ?>
+<?php unset($__componentOriginal8c81617a70e11bcf247c4db924ab1b62); ?>
+<?php endif; ?>
+                                </a>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </div>
+                </section>
+            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+
             <section class="rounded-2xl border border-slate-200 bg-white p-4 text-sm">
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">Pembayaran</p>
                 <dl class="mt-2 space-y-1.5">
@@ -216,7 +278,7 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
             </section>
 
             <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('cancel', $order)): ?>
-                <button wire:click="cancel" wire:confirm="Batalkan pesanan ini?" class="w-full rounded-full border border-rose-200 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50" data-testid="cancel-order-button">Batalkan pesanan</button>
+                <button wire:click="cancel" wire:confirm="<?php echo e($order->isPaid() ? 'Pesanan ini sudah dibayar. Jika dibatalkan, pengembalian dana dilakukan manual oleh pihak kantin. Yakin ingin membatalkan pesanan?' : 'Batalkan pesanan ini?'); ?>" class="w-full rounded-full border border-rose-200 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50" data-testid="cancel-order-button">Batalkan pesanan</button>
             <?php endif; ?>
         </aside>
     </div>
