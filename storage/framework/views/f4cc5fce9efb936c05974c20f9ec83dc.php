@@ -41,6 +41,8 @@ unset($__defined_vars, $__key, $__value); ?>
         $user->isTenantAdmin() ? ['route' => 'tenant.dashboard', 'label' => 'Dashboard', 'icon' => 'chart'] : null,
         ['route' => 'tenant.orders', 'label' => 'Pesanan', 'icon' => 'list'],
         $user->tenant?->is_koperasi ? ['route' => 'tenant.cashier', 'label' => 'Kasir Koperasi', 'icon' => 'cash'] : null,
+        $user->isTenantAdmin() && $user->tenant?->is_koperasi ? ['route' => 'tenant.spending.rekap', 'label' => 'Rekap Belanja', 'icon' => 'chart'] : null,
+        $user->isTenantAdmin() && $user->tenant?->is_koperasi ? ['route' => 'tenant.spending.settings', 'label' => 'Jabatan & Target', 'icon' => 'users'] : null,
         $user->isTenantAdmin() ? ['route' => 'tenant.products', 'label' => 'Menu', 'icon' => 'store'] : null,
         $user->isTenantAdmin() ? ['route' => 'tenant.payments', 'label' => 'Pembayaran', 'icon' => 'cash'] : null,
     ]))); ?>

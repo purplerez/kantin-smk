@@ -26,6 +26,8 @@ use App\Livewire\Tenant\Dashboard as TenantDashboard;
 use App\Livewire\Tenant\OrderBoard;
 use App\Livewire\Tenant\Payments as TenantPayments;
 use App\Livewire\Tenant\Products as TenantProducts;
+use App\Livewire\Tenant\SpendingRecap;
+use App\Livewire\Tenant\SpendingSettings;
 use Illuminate\Support\Facades\Route;
 
 // ---------- Auth (tanpa registrasi publik) ----------
@@ -68,6 +70,8 @@ Route::prefix('tenant-panel')->name('tenant.')->middleware(['auth', 'role:tenant
         Route::get('/', TenantDashboard::class)->name('dashboard');
         Route::get('/menu', TenantProducts::class)->name('products');
         Route::get('/pembayaran', TenantPayments::class)->name('payments');
+        Route::get('/rekap-belanja', SpendingRecap::class)->name('spending.rekap');
+        Route::get('/jabatan-target', SpendingSettings::class)->name('spending.settings');
     });
 });
 

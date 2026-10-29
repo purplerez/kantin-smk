@@ -469,4 +469,5 @@ unset($__errorArgs, $__bag); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendB
         </div>
     <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
 </div>
+
 <?php /**PATH /Users/mac/Herd/kantinsmk-go/resources/views/livewire/tenant/cashier.blade.php ENDPATH**/ ?>
