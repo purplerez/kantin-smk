@@ -12,13 +12,16 @@ class Tenant extends Model
     public const STATUS_SUSPENDED = 'suspended';
 
     protected $fillable = [
-        'name', 'slug', 'description', 'image_url', 'status', 'is_open',
+        'name', 'slug', 'description', 'image_url', 'status', 'is_open', 'is_koperasi',
         'bank_name', 'bank_account', 'bank_holder',
     ];
 
     protected function casts(): array
     {
-        return ['is_open' => 'boolean'];
+        return [
+            'is_open' => 'boolean',
+            'is_koperasi' => 'boolean',
+        ];
     }
 
     public function products(): HasMany
@@ -39,6 +42,16 @@ class Tenant extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function spendingTargets(): HasMany
+    {
+        return $this->hasMany(SpendingTarget::class);
+    }
+
+    public function spendingClosings(): HasMany
+    {
+        return $this->hasMany(SpendingClosing::class);
     }
 
     public function isActive(): bool

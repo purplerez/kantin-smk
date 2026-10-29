@@ -163,6 +163,7 @@ class CheckoutService
             $invoice->orders()->where('status', OrderStatus::Pending)->each(function (Order $order) {
                 $order->update([
                     'payment_status' => PaymentStatus::Paid,
+                    'paid_at' => now(),
                     'status' => OrderStatus::Confirmed,
                     'confirmed_at' => now(),
                 ]);

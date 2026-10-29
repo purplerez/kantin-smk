@@ -17,9 +17,11 @@ use App\Livewire\Buyer\Cart;
 use App\Livewire\Buyer\Catalog;
 use App\Livewire\Buyer\Checkout;
 use App\Livewire\Buyer\InvoiceShow;
+use App\Livewire\Buyer\KoperasiSpending;
 use App\Livewire\Buyer\OrderDetail;
 use App\Livewire\Buyer\Orders;
 use App\Livewire\Buyer\TenantMenu;
+use App\Livewire\Tenant\Cashier;
 use App\Livewire\Tenant\Dashboard as TenantDashboard;
 use App\Livewire\Tenant\OrderBoard;
 use App\Livewire\Tenant\Payments as TenantPayments;
@@ -53,12 +55,14 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/invoice/{invoice}', InvoiceShow::class)->name('invoice.show');
     Route::get('/pesanan', Orders::class)->name('orders');
     Route::get('/pesanan/{order}', OrderDetail::class)->name('orders.show');
+    Route::get('/belanja-koperasi', KoperasiSpending::class)->name('koperasi.spending');
     Route::get('/akun', Account::class)->name('account');
 });
 
 // ---------- Tenant (admin & staf) ----------
 Route::prefix('tenant-panel')->name('tenant.')->middleware(['auth', 'role:tenant_admin,tenant_staf'])->group(function () {
     Route::get('/pesanan', OrderBoard::class)->name('orders');
+    Route::get('/kasir', Cashier::class)->name('cashier');
 
     Route::middleware('role:tenant_admin')->group(function () {
         Route::get('/', TenantDashboard::class)->name('dashboard');

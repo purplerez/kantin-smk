@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Enums\Role;
 use App\Models\Category;
+use App\Models\Position;
 use App\Models\Product;
+use App\Models\SpendingTarget;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -69,11 +71,12 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($tenants as $data) {
+            $isKoperasi = ($data['name'] === 'Koperasi Siswa');
             $tenant = Tenant::updateOrCreate(
                 ['slug' => Str::slug($data['name'])],
                 [
                     'name' => $data['name'], 'description' => $data['description'], 'image_url' => $data['image_url'],
-                    'status' => Tenant::STATUS_ACTIVE, 'is_open' => true,
+                    'status' => Tenant::STATUS_ACTIVE, 'is_open' => true, 'is_koperasi' => $isKoperasi,
                     'bank_name' => $data['bank_name'] ?? null, 'bank_account' => $data['bank_account'] ?? null, 'bank_holder' => $data['bank_holder'] ?? null,
                 ],
             );
@@ -91,8 +94,42 @@ class DatabaseSeeder extends Seeder
             }
         }
 
+        // ===== Jabatan & Target Belanja Koperasi =====
+        $posGuru = Position::updateOrCreate(['name' => 'Guru Tetap'], ['is_active' => true]);
+        $posTU = Position::updateOrCreate(['name' => 'Staf Tata Usaha'], ['is_active' => true]);
+        $posKontrak = Position::updateOrCreate(['name' => 'Pegawai Kontrak'], ['is_active' => true]);
+
+        $koperasi = Tenant::where('slug', 'koperasi-siswa')->first();
+        if ($koperasi) {
+            SpendingTarget::updateOrCreate(
+                ['position_id' => $posGuru->id, 'tenant_id' => $koperasi->id, 'effective_from' => '2026-01-01'],
+                ['amount' => 150000, 'effective_to' => null],
+            );
+            SpendingTarget::updateOrCreate(
+                ['position_id' => $posTU->id, 'tenant_id' => $koperasi->id, 'effective_from' => '2026-01-01'],
+                ['amount' => 100000, 'effective_to' => null],
+            );
+            SpendingTarget::updateOrCreate(
+                ['position_id' => $posKontrak->id, 'tenant_id' => $koperasi->id, 'effective_from' => '2026-01-01'],
+                ['amount' => 75000, 'effective_to' => null],
+            );
+        }
+
         // ===== Pembeli demo =====
-        User::updateOrCreate(['email' => 'siswa@smkgo.id'], ['name' => 'Nadia Pratama', 'identifier' => '2024001', 'password' => 'buyer123', 'role' => Role::User, 'is_active' => true]);
-        User::updateOrCreate(['email' => 'guru@smkgo.id'], ['name' => 'Pak Hendra', 'identifier' => '19870512', 'password' => 'guru123', 'role' => Role::User, 'is_active' => true]);
+        // 1. Siswa (punya NIS, tanpa jabatan)
+        User::updateOrCreate(
+            ['email' => 'siswa@smkgo.id'],
+            ['name' => 'Nadia Pratama', 'identifier' => '2024001', 'password' => 'buyer123', 'role' => Role::User, 'position_id' => null, 'is_active' => true],
+        );
+        // 2. Guru / Pegawai (punya NIP, punya jabatan dengan target belanja)
+        User::updateOrCreate(
+            ['email' => 'guru@smkgo.id'],
+            ['name' => 'Pak Hendra', 'identifier' => '19870512', 'password' => 'guru123', 'role' => Role::User, 'position_id' => $posGuru->id, 'is_active' => true],
+        );
+        // 3. Pelanggan Umum / Tamu (tanpa NIS/NIP, tanpa jabatan)
+        User::updateOrCreate(
+            ['email' => 'tamu@smkgo.id'],
+            ['name' => 'Pelanggan Umum', 'identifier' => null, 'password' => 'tamu123', 'role' => Role::User, 'position_id' => null, 'is_active' => true],
+        );
     }
 }
