@@ -45,7 +45,7 @@
                         <div class="truncate text-sm font-bold">{{ $user->name }}</div>
                         <div class="text-xs text-slate-500">{{ $user->role->label() }}</div>
                     </div>
-                    <livewire:notifications-bell key="panel-bell-desktop" />
+                    <livewire:notifications-bell key="panel-bell-desktop" :drop-up="true" />
                     <x-sound-toggle />
                 </div>
                 <form method="POST" action="{{ route('logout') }}" class="mt-3">

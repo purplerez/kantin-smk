@@ -26,7 +26,7 @@
     </button>
 
     <div x-show="open" x-cloak @click.outside="open = false" x-transition
-         class="absolute right-0 z-50 mt-2 w-80 max-w-[90vw] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
+         class="absolute right-0 z-50 w-80 max-w-[90vw] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl <?php echo e($dropUp ? 'bottom-full mb-2' : 'mt-2'); ?>"
          data-testid="notifications-panel">
         <div class="flex items-center justify-between border-b border-slate-100 px-4 py-2.5">
             <strong class="text-sm">Notifikasi</strong>

@@ -106,7 +106,7 @@ unset($__defined_vars, $__key, $__value); ?>
 $__split = function ($name, $params = []) {
     return [$name, $params];
 };
-[$__name, $__params] = $__split('notifications-bell', []);
+[$__name, $__params] = $__split('notifications-bell', ['dropUp' => true]);
 
 $__key = 'panel-bell-desktop';
 

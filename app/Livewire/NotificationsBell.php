@@ -7,6 +7,8 @@ use Livewire\Component;
 
 class NotificationsBell extends Component
 {
+    public bool $dropUp = false;
+
     public function markAllRead(): void
     {
         Notification::where('user_id', auth()->id())->whereNull('read_at')->update(['read_at' => now()]);
