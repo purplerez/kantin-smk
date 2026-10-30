@@ -38,7 +38,7 @@ class CheckoutService
 
         $invoice = DB::transaction(function () use ($buyer, $method, $note, $lines, $productIds) {
             // Anti-race: kunci baris produk & re-validasi ketersediaan + harga dari DB (jangan percaya klien).
-            $fresh = Product::with('tenant')
+            $fresh = Product::with('tenant.hours')
                 ->whereIn('id', $productIds)
                 ->lockForUpdate()
                 ->get()
@@ -48,7 +48,9 @@ class CheckoutService
             $serverLines = [];
             foreach ($lines as $productId => $line) {
                 $product = $fresh->get($productId);
-                if (! $product || ! $product->isSellable()) {
+                // isOrderable() — produk tersedia & tenant aktif, terlepas dari is_open/jam operasional.
+                // Toko tutup/di luar jam → status PO, bukan penolakan.
+                if (! $product || ! $product->isOrderable()) {
                     $unsellable[] = $product->name ?? $line['product']->name;
 
                     continue;
@@ -69,8 +71,8 @@ class CheckoutService
                 ]);
             }
 
-            $serverTotal = (int) collect($serverLines)->sum('line_total');
-            $initialStatus = $method->requiresPrepayment() ? OrderStatus::Pending : OrderStatus::Confirmed;
+            $serverTotal    = (int) collect($serverLines)->sum('line_total');
+            $isPrepay       = $method->requiresPrepayment();
 
             $invoice = Invoice::create([
                 'code' => Invoice::generateCode(),
@@ -92,16 +94,37 @@ class CheckoutService
             ]);
 
             foreach (collect($serverLines)->groupBy('tenant_id') as $tenantId => $tenantLines) {
+                /** @var \App\Models\Tenant $tenant */
+                $tenant = $fresh->firstWhere('tenant_id', (int) $tenantId)?->tenant;
+                $tenant?->loadMissing('hours');
+
+                // Tentukan status awal per-tenant:
+                //   - Di luar jam operasional → pre_order (berlaku untuk tunai maupun pra-bayar)
+                //   - Dalam jam + pra-bayar (QRIS/transfer) → pending
+                //   - Dalam jam + tunai → confirmed langsung
+                $withinHours = $tenant?->isWithinOperatingHours() ?? true;
+
+                $orderStatus = match (true) {
+                    ! $withinHours => OrderStatus::PreOrder,
+                    $isPrepay      => OrderStatus::Pending,
+                    default        => OrderStatus::Confirmed,
+                };
+
+                $scheduledFor = ($orderStatus === OrderStatus::PreOrder)
+                    ? $tenant?->nextOpenAt()
+                    : null;
+
                 $order = Order::create([
-                    'code' => Order::generateCode(),
-                    'invoice_id' => $invoice->id,
-                    'buyer_id' => $buyer->id,
-                    'tenant_id' => $tenantId,
-                    'status' => $initialStatus,
+                    'code'           => Order::generateCode(),
+                    'invoice_id'     => $invoice->id,
+                    'buyer_id'       => $buyer->id,
+                    'tenant_id'      => $tenantId,
+                    'status'         => $orderStatus,
                     'payment_status' => PaymentStatus::Pending,
-                    'subtotal' => (int) $tenantLines->sum('line_total'),
-                    'note' => $note,
-                    'confirmed_at' => $initialStatus === OrderStatus::Confirmed ? now() : null,
+                    'subtotal'       => (int) $tenantLines->sum('line_total'),
+                    'note'           => $note,
+                    'confirmed_at'   => $orderStatus === OrderStatus::Confirmed ? now() : null,
+                    'scheduled_for'  => $scheduledFor,
                 ]);
 
                 foreach ($tenantLines as $line) {
@@ -116,11 +139,12 @@ class CheckoutService
                     ]);
                 }
 
-                // Tunai langsung actionable -> beri tahu tenant. Prepay diberi tahu saat lunas.
-                if (! $method->requiresPrepayment()) {
+                // Tunai & dalam jam operasional langsung actionable → beri tahu tenant.
+                // PO dan pra-bayar diberi tahu saat dikonfirmasi / lunas.
+                if (! $isPrepay && $orderStatus !== OrderStatus::PreOrder) {
                     $this->notifications->notifyTenant((int) $tenantId, 'order.new', [
-                        'order' => $order->code,
-                        'buyer' => $buyer->name,
+                        'order'  => $order->code,
+                        'buyer'  => $buyer->name,
                         'amount' => $order->subtotal,
                     ]);
                 }

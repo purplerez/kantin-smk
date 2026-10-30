@@ -10,28 +10,31 @@ enum OrderStatus: string
     case Ready = 'ready';
     case Completed = 'completed';
     case Cancelled = 'cancelled';
+    case PreOrder = 'pre_order';
 
     public function label(): string
     {
         return match ($this) {
-            self::Pending => 'Menunggu Pembayaran',
+            self::Pending   => 'Menunggu Pembayaran',
             self::Confirmed => 'Dikonfirmasi',
             self::Preparing => 'Sedang Disiapkan',
-            self::Ready => 'Siap Diambil',
+            self::Ready     => 'Siap Diambil',
             self::Completed => 'Selesai',
             self::Cancelled => 'Dibatalkan',
+            self::PreOrder  => 'Pre-Order',
         };
     }
 
     public function color(): string
     {
         return match ($this) {
-            self::Pending => 'bg-amber-100 text-amber-800',
+            self::Pending   => 'bg-amber-100 text-amber-800',
             self::Confirmed => 'bg-sky-100 text-sky-800',
             self::Preparing => 'bg-orange-100 text-orange-800',
-            self::Ready => 'bg-brand/10 text-brand-dark',
+            self::Ready     => 'bg-brand/10 text-brand-dark',
             self::Completed => 'bg-slate-200 text-slate-700',
             self::Cancelled => 'bg-rose-100 text-rose-800',
+            self::PreOrder  => 'bg-violet-100 text-violet-800',
         };
     }
 
@@ -41,8 +44,8 @@ enum OrderStatus: string
         return match ($this) {
             self::Confirmed => self::Preparing,
             self::Preparing => self::Ready,
-            self::Ready => self::Completed,
-            default => null,
+            self::Ready     => self::Completed,
+            default         => null,
         };
     }
 

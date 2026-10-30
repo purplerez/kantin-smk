@@ -52,4 +52,14 @@ class Product extends Model
     {
         return $this->is_available_today && $this->tenant?->canSell();
     }
+
+    /**
+     * Produk yang boleh dipesan (termasuk PO):
+     * menu tersedia hari ini + tenant aktif (tidak peduli is_open / jam operasional).
+     * Dipakai oleh CheckoutService agar checkout tidak ditolak saat toko tutup.
+     */
+    public function isOrderable(): bool
+    {
+        return $this->is_available_today && $this->tenant?->isActive();
+    }
 }

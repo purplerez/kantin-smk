@@ -45,6 +45,7 @@ unset($__defined_vars, $__key, $__value); ?>
         $user->isTenantAdmin() && $user->tenant?->is_koperasi ? ['route' => 'tenant.spending.settings', 'label' => 'Jabatan & Target', 'icon' => 'users'] : null,
         $user->isTenantAdmin() ? ['route' => 'tenant.products', 'label' => 'Menu', 'icon' => 'store'] : null,
         $user->isTenantAdmin() ? ['route' => 'tenant.payments', 'label' => 'Pembayaran', 'icon' => 'cash'] : null,
+        $user->isTenantAdmin() ? ['route' => 'tenant.operating.hours', 'label' => 'Jam Operasional', 'icon' => 'clock'] : null,
     ]))); ?>
 <?php if (isset($component)) { $__componentOriginald4c772c02301431d3253f64117700596 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald4c772c02301431d3253f64117700596 = $attributes; } ?>

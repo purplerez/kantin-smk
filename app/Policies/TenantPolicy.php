@@ -13,6 +13,12 @@ class TenantPolicy
         return $user->isAdmin() || ($user->isTenantAdmin() && (int) $user->tenant_id === (int) $tenant->id);
     }
 
+    /** Alias untuk manage — digunakan oleh OperatingHours dan halaman pengaturan lainnya. */
+    public function update(User $user, Tenant $tenant): bool
+    {
+        return $this->manage($user, $tenant);
+    }
+
     /** Persetujuan / penangguhan tenant hanya platform admin. */
     public function moderate(User $user, Tenant $tenant): bool
     {

@@ -14,6 +14,27 @@
                         <span class="grid h-10 w-10 place-items-center rounded-full bg-rose-100"><x-icon name="x" class="h-5 w-5" /></span>
                         <div><strong class="block text-sm">Pesanan dibatalkan</strong><span class="text-xs">{{ $order->cancel_reason }} · {{ $order->cancelled_at?->translatedFormat('d M H:i') }}</span></div>
                     </div>
+                @elseif ($order->status === \App\Enums\OrderStatus::PreOrder)
+                    {{-- State Pre-Order: toko belum buka --}}
+                    <div class="flex flex-col items-center gap-3 py-4 text-center" data-testid="po-state">
+                        <span class="grid h-14 w-14 place-items-center rounded-full bg-violet-100 text-violet-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </span>
+                        <div>
+                            <strong class="block text-sm text-violet-800">Pre-Order diterima</strong>
+                            <p class="mt-1 text-xs text-slate-500">
+                                Pesananmu sudah masuk. Toko <strong>{{ $order->tenant->name }}</strong> belum buka —
+                                pesanan akan dikonfirmasi otomatis ketika toko mulai beroperasi.
+                            </p>
+                            @if ($order->scheduled_for)
+                                <p class="mt-2 inline-flex items-center gap-1 rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">
+                                    ⏰ Perkiraan: {{ $order->scheduled_for->setTimezone('Asia/Jakarta')->isoFormat('dddd, D MMM · HH:mm') }}
+                                </p>
+                            @endif
+                        </div>
+                    </div>
                 @else
                     @if ($order->status === \App\Enums\OrderStatus::Pending)
                         <a href="{{ route('invoice.show', $order->invoice) }}" wire:navigate class="mb-5 flex items-center justify-between rounded-xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800" data-testid="pay-now-link">Menunggu pembayaran — bayar sekarang <span>→</span></a>
