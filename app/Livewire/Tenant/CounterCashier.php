@@ -46,6 +46,12 @@ class CounterCashier extends Component
 
     public string $note = '';
 
+    public function mount(): void
+    {
+        $user = auth()->user();
+        abort_unless($user && $user->tenant && $user->tenant->isActive(), 403);
+    }
+
     // ----------------------------------------------------------------
     // Cart Actions
     // ----------------------------------------------------------------
