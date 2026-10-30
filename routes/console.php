@@ -19,3 +19,9 @@ Artisan::command('kantin:reset-availability', function () {
 Schedule::command('kantin:auto-cancel-unpaid')->everyFifteenMinutes();
 Schedule::command('kantin:generate-settlements')->dailyAt('23:30');
 Schedule::command('kantin:reset-availability')->dailyAt('06:00');
+
+// Auto-confirm pre-order saat jam operasional tiba (tiap menit, tanpa overlap).
+Schedule::call(fn () => app(\App\Services\PreOrderService::class)->autoConfirmDue())
+    ->everyMinute()
+    ->name('pre-order:auto-confirm')
+    ->withoutOverlapping();

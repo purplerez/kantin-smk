@@ -11,6 +11,25 @@
         <div class="rounded-2xl border border-slate-200 bg-white p-4"><p class="text-xs text-slate-500">Total belanja</p><strong class="text-2xl font-extrabold" data-testid="account-total-spent">@rupiah($totalSpent)</strong></div>
     </div>
 
+    <a href="{{ route('koperasi.spending') }}" wire:navigate class="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-brand/20 bg-brand/5 p-4 transition hover:bg-brand/10 shadow-sm" data-testid="koperasi-spending-link">
+        <div class="flex items-center gap-3">
+            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand text-white shadow-sm">
+                <x-icon name="store" class="h-5 w-5" />
+            </span>
+            <div>
+                <strong class="block text-sm font-bold text-slate-800">Belanja Koperasi</strong>
+                <small class="text-xs text-slate-500">
+                    @if ($user->hasSpendingTarget())
+                        Monitor target & riwayat belanja bulanan
+                    @else
+                        Riwayat belanja di koperasi sekolah
+                    @endif
+                </small>
+            </div>
+        </div>
+        <x-icon name="forward" class="h-5 w-5 text-slate-400" />
+    </a>
+
     <ul class="mt-4 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white text-sm">
         <li class="flex items-center gap-3 px-4 py-3"><x-icon name="shield" class="h-5 w-5 text-brand" /><span><strong class="block">Peran akses</strong><small class="text-slate-500">{{ $user->role->label() }}</small></span></li>
         <li class="flex items-center gap-3 px-4 py-3"><x-icon name="store" class="h-5 w-5 text-brand" /><span><strong class="block">Pickup sekolah</strong><small class="text-slate-500">Semua pesanan diambil langsung di tenant</small></span></li>

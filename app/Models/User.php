@@ -13,7 +13,7 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'identifier', 'password', 'role', 'tenant_id', 'is_active', 'must_change_password',
+        'name', 'email', 'identifier', 'password', 'role', 'tenant_id', 'position_id', 'is_active', 'must_change_password',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -31,6 +31,21 @@ class User extends Authenticatable
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    public function position(): BelongsTo
+    {
+        return $this->belongsTo(Position::class);
+    }
+
+    public function isEmployee(): bool
+    {
+        return $this->position_id !== null;
+    }
+
+    public function hasSpendingTarget(): bool
+    {
+        return $this->isEmployee();
     }
 
     public function orders(): HasMany

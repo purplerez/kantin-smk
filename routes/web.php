@@ -17,13 +17,19 @@ use App\Livewire\Buyer\Cart;
 use App\Livewire\Buyer\Catalog;
 use App\Livewire\Buyer\Checkout;
 use App\Livewire\Buyer\InvoiceShow;
+use App\Livewire\Buyer\KoperasiSpending;
 use App\Livewire\Buyer\OrderDetail;
 use App\Livewire\Buyer\Orders;
 use App\Livewire\Buyer\TenantMenu;
+use App\Livewire\Tenant\Cashier;
+use App\Livewire\Tenant\CounterCashier;
 use App\Livewire\Tenant\Dashboard as TenantDashboard;
+use App\Livewire\Tenant\OperatingHours;
 use App\Livewire\Tenant\OrderBoard;
 use App\Livewire\Tenant\Payments as TenantPayments;
 use App\Livewire\Tenant\Products as TenantProducts;
+use App\Livewire\Tenant\SpendingRecap;
+use App\Livewire\Tenant\SpendingSettings;
 use Illuminate\Support\Facades\Route;
 
 // ---------- Auth (tanpa registrasi publik) ----------
@@ -43,6 +49,7 @@ Route::post('/webhook/payment/{invoice}', [PaymentWebhookController::class, 'han
 // ---------- Cron platform / shared-hosting (bearer secret) ----------
 Route::post('/cron/auto-cancel', [CronController::class, 'autoCancel'])->name('cron.auto-cancel');
 Route::post('/cron/settlements', [CronController::class, 'settlements'])->name('cron.settlements');
+Route::post('/cron/pre-order-confirm', [CronController::class, 'preOrderConfirm'])->name('cron.pre-order');
 
 // ---------- Pembeli (siswa / guru / staf sekolah) ----------
 Route::middleware(['auth', 'role:user'])->group(function () {
@@ -53,17 +60,23 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/invoice/{invoice}', InvoiceShow::class)->name('invoice.show');
     Route::get('/pesanan', Orders::class)->name('orders');
     Route::get('/pesanan/{order}', OrderDetail::class)->name('orders.show');
+    Route::get('/belanja-koperasi', KoperasiSpending::class)->name('koperasi.spending');
     Route::get('/akun', Account::class)->name('account');
 });
 
 // ---------- Tenant (admin & staf) ----------
 Route::prefix('tenant-panel')->name('tenant.')->middleware(['auth', 'role:tenant_admin,tenant_staf'])->group(function () {
     Route::get('/pesanan', OrderBoard::class)->name('orders');
+    Route::get('/kasir-counter', CounterCashier::class)->name('counter');
+    Route::get('/kasir', Cashier::class)->name('cashier');
 
     Route::middleware('role:tenant_admin')->group(function () {
         Route::get('/', TenantDashboard::class)->name('dashboard');
         Route::get('/menu', TenantProducts::class)->name('products');
         Route::get('/pembayaran', TenantPayments::class)->name('payments');
+        Route::get('/rekap-belanja', SpendingRecap::class)->name('spending.rekap');
+        Route::get('/jabatan-target', SpendingSettings::class)->name('spending.settings');
+        Route::get('/jam-operasional', OperatingHours::class)->name('operating.hours');
     });
 });
 

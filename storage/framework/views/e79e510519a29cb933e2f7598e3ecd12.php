@@ -194,6 +194,19 @@
         <aside class="space-y-3">
             <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400"><?php echo e($invoice->orders->count()); ?> order dalam invoice ini</p>
             <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $invoice->orders; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->status === \App\Enums\OrderStatus::PreOrder): ?>
+                    <div class="rounded-2xl border border-violet-200 bg-violet-50 p-4 text-sm text-violet-800" data-testid="po-banner-<?php echo e($order->id); ?>">
+                        <strong class="block">⏰ Pre-Order — <?php echo e($order->tenant->name); ?></strong>
+                        <p class="mt-1 text-xs">Toko belum buka. Pesanan akan dikonfirmasi otomatis ketika toko mulai beroperasi.</p>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->scheduled_for): ?>
+                            <p class="mt-1.5 text-xs font-semibold">
+                                Perkiraan diproses: <?php echo e($order->scheduled_for->setTimezone('Asia/Jakarta')->isoFormat('dddd, D MMM · HH:mm')); ?>
+
+                            </p>
+                        <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                    </div>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
                 <a href="<?php echo e(route('orders.show', $order)); ?>" wire:navigate class="block rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-brand" data-testid="invoice-order-<?php echo e($order->id); ?>" wire:key="inv-order-<?php echo e($order->id); ?>">
                     <div class="flex items-start justify-between gap-2">
                         <div>

@@ -12,8 +12,13 @@
     : array_values(array_filter([
         $user->isTenantAdmin() ? ['route' => 'tenant.dashboard', 'label' => 'Dashboard', 'icon' => 'chart'] : null,
         ['route' => 'tenant.orders', 'label' => 'Pesanan', 'icon' => 'list'],
+        ['route' => 'tenant.counter', 'label' => 'Kasir Counter', 'icon' => 'bag'],
+        $user->tenant?->is_koperasi ? ['route' => 'tenant.cashier', 'label' => 'Kasir Koperasi', 'icon' => 'cash'] : null,
+        $user->isTenantAdmin() && $user->tenant?->is_koperasi ? ['route' => 'tenant.spending.rekap', 'label' => 'Rekap Belanja', 'icon' => 'chart'] : null,
+        $user->isTenantAdmin() && $user->tenant?->is_koperasi ? ['route' => 'tenant.spending.settings', 'label' => 'Jabatan & Target', 'icon' => 'users'] : null,
         $user->isTenantAdmin() ? ['route' => 'tenant.products', 'label' => 'Menu', 'icon' => 'store'] : null,
         $user->isTenantAdmin() ? ['route' => 'tenant.payments', 'label' => 'Pembayaran', 'icon' => 'cash'] : null,
+        $user->isTenantAdmin() ? ['route' => 'tenant.operating.hours', 'label' => 'Jam Operasional', 'icon' => 'clock'] : null,
     ])))
 <x-layouts.base :title="$title">
     <div class="flex min-h-full">
@@ -42,7 +47,7 @@
                         <div class="truncate text-sm font-bold">{{ $user->name }}</div>
                         <div class="text-xs text-slate-500">{{ $user->role->label() }}</div>
                     </div>
-                    <livewire:notifications-bell key="panel-bell-desktop" />
+                    <livewire:notifications-bell key="panel-bell-desktop" :drop-up="true" />
                     <x-sound-toggle />
                 </div>
                 <form method="POST" action="{{ route('logout') }}" class="mt-3">

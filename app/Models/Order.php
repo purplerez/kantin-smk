@@ -17,6 +17,7 @@ class Order extends Model
     protected $fillable = [
         'code', 'invoice_id', 'buyer_id', 'tenant_id', 'status', 'payment_status', 'subtotal', 'note',
         'confirmed_at', 'ready_at', 'completed_at', 'cancelled_at', 'cancel_reason',
+        'source', 'entered_by', 'paid_at', 'scheduled_for',
     ];
 
     protected function casts(): array
@@ -26,9 +27,11 @@ class Order extends Model
             'status' => OrderStatus::class,
             'payment_status' => PaymentStatus::class,
             'confirmed_at' => 'datetime',
-            'ready_at' => 'datetime',
+            'ready_at'     => 'datetime',
             'completed_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'paid_at'      => 'datetime',
+            'scheduled_for'=> 'datetime',
         ];
     }
 
@@ -40,6 +43,20 @@ class Order extends Model
     public function buyer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'buyer_id');
+    }
+
+    public function enteredBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'entered_by');
+    }
+
+    public function setPaidAtAttribute($value): void
+    {
+        if ($value instanceof \Carbon\CarbonInterface) {
+            $this->attributes['paid_at'] = $value->copy()->setTimezone(config('app.timezone', 'UTC'))->format('Y-m-d H:i:s');
+        } else {
+            $this->attributes['paid_at'] = $value;
+        }
     }
 
     public function items(): HasMany
@@ -59,7 +76,7 @@ class Order extends Model
 
     public function canBeCancelledByBuyer(): bool
     {
-        return in_array($this->status, [OrderStatus::Pending, OrderStatus::Confirmed], true);
+        return in_array($this->status, [OrderStatus::Pending, OrderStatus::Confirmed, OrderStatus::PreOrder], true);
     }
 
     public function canBeReviewed(): bool

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\PreOrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -15,7 +16,7 @@ class CronController extends Controller
     // Cron endpoints must ack 2xx immediately; keep the work light and fast.
     private function authorized(Request $request): bool
     {
-        $secret = (string) env('KANTIN_CRON_SECRET', '');
+        $secret   = (string) env('KANTIN_CRON_SECRET', '');
         $provided = (string) $request->bearerToken();
 
         return $secret !== '' && hash_equals($secret, $provided);
@@ -42,4 +43,16 @@ class CronController extends Controller
 
         return response()->json(['ok' => true, 'output' => trim(Artisan::output())]);
     }
+
+    public function preOrderConfirm(Request $request, PreOrderService $service): JsonResponse
+    {
+        if (! $this->authorized($request)) {
+            return response()->json(['error' => 'unauthorized'], 401);
+        }
+
+        $count = $service->autoConfirmDue();
+
+        return response()->json(['ok' => true, 'confirmed' => $count]);
+    }
 }
+

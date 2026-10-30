@@ -70,6 +70,28 @@
 <?php endif; ?></span>
                         <div><strong class="block text-sm">Pesanan dibatalkan</strong><span class="text-xs"><?php echo e($order->cancel_reason); ?> · <?php echo e($order->cancelled_at?->translatedFormat('d M H:i')); ?></span></div>
                     </div>
+                <?php elseif($order->status === \App\Enums\OrderStatus::PreOrder): ?>
+                    
+                    <div class="flex flex-col items-center gap-3 py-4 text-center" data-testid="po-state">
+                        <span class="grid h-14 w-14 place-items-center rounded-full bg-violet-100 text-violet-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </span>
+                        <div>
+                            <strong class="block text-sm text-violet-800">Pre-Order diterima</strong>
+                            <p class="mt-1 text-xs text-slate-500">
+                                Pesananmu sudah masuk. Toko <strong><?php echo e($order->tenant->name); ?></strong> belum buka —
+                                pesanan akan dikonfirmasi otomatis ketika toko mulai beroperasi.
+                            </p>
+                            <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->scheduled_for): ?>
+                                <p class="mt-2 inline-flex items-center gap-1 rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">
+                                    ⏰ Perkiraan: <?php echo e($order->scheduled_for->setTimezone('Asia/Jakarta')->isoFormat('dddd, D MMM · HH:mm')); ?>
+
+                                </p>
+                            <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                        </div>
+                    </div>
                 <?php else: ?>
                     <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($order->status === \App\Enums\OrderStatus::Pending): ?>
                         <a href="<?php echo e(route('invoice.show', $order->invoice)); ?>" wire:navigate class="mb-5 flex items-center justify-between rounded-xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800" data-testid="pay-now-link">Menunggu pembayaran — bayar sekarang <span>→</span></a>

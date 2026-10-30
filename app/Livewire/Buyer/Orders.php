@@ -64,7 +64,7 @@ class Orders extends Component
 
     public function render()
     {
-        $active = [OrderStatus::Pending, OrderStatus::Confirmed, OrderStatus::Preparing, OrderStatus::Ready];
+        $active = [OrderStatus::PreOrder, OrderStatus::Pending, OrderStatus::Confirmed, OrderStatus::Preparing, OrderStatus::Ready];
 
         $orders = Order::query()
             ->with(['tenant', 'items', 'invoice'])

@@ -23,6 +23,7 @@ class OrderBoard extends Component
     #[Url]
     public string $status = 'confirmed';
 
+
     #[Url(as: 'q')]
     public string $search = '';
 
@@ -34,7 +35,7 @@ class OrderBoard extends Component
     public function mount(): void
     {
         $this->tenantId = (int) auth()->user()->tenant_id;
-        $this->seenConfirmedIds = Order::where('status', OrderStatus::Confirmed)->pluck('id')->all();
+        $this->seenConfirmedIds = Order::whereIn('status', [OrderStatus::Confirmed, OrderStatus::PreOrder])->pluck('id')->all();
     }
 
     /** Push instan dari Reverb (kanal privat tenant). */
@@ -107,17 +108,18 @@ class OrderBoard extends Component
             ->paginate(12);
 
         return view('livewire.tenant.order-board', [
-            'orders' => $orders,
-            'counts' => $counts,
+            'orders'  => $orders,
+            'counts'  => $counts,
             'pollSeconds' => 6,
             'tabs' => [
-                'pending' => 'Belum bayar',
+                'pre_order' => 'Pre-Order',
+                'pending'   => 'Belum bayar',
                 'confirmed' => 'Baru',
                 'preparing' => 'Disiapkan',
-                'ready' => 'Siap diambil',
+                'ready'     => 'Siap diambil',
                 'completed' => 'Selesai',
                 'cancelled' => 'Batal',
-                'semua' => 'Semua',
+                'semua'     => 'Semua',
             ],
         ]);
     }

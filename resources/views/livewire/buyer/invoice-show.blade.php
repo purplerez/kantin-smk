@@ -79,6 +79,18 @@
         <aside class="space-y-3">
             <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">{{ $invoice->orders->count() }} order dalam invoice ini</p>
             @foreach ($invoice->orders as $order)
+                {{-- Banner Pre-Order --}}
+                @if ($order->status === \App\Enums\OrderStatus::PreOrder)
+                    <div class="rounded-2xl border border-violet-200 bg-violet-50 p-4 text-sm text-violet-800" data-testid="po-banner-{{ $order->id }}">
+                        <strong class="block">⏰ Pre-Order — {{ $order->tenant->name }}</strong>
+                        <p class="mt-1 text-xs">Toko belum buka. Pesanan akan dikonfirmasi otomatis ketika toko mulai beroperasi.</p>
+                        @if ($order->scheduled_for)
+                            <p class="mt-1.5 text-xs font-semibold">
+                                Perkiraan diproses: {{ $order->scheduled_for->setTimezone('Asia/Jakarta')->isoFormat('dddd, D MMM · HH:mm') }}
+                            </p>
+                        @endif
+                    </div>
+                @endif
                 <a href="{{ route('orders.show', $order) }}" wire:navigate class="block rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-brand" data-testid="invoice-order-{{ $order->id }}" wire:key="inv-order-{{ $order->id }}">
                     <div class="flex items-start justify-between gap-2">
                         <div>

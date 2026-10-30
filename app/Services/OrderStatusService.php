@@ -70,7 +70,10 @@ class OrderStatusService
     public function markPaid(Order $order): Order
     {
         DB::transaction(function () use ($order) {
-            $updates = ['payment_status' => PaymentStatus::Paid];
+            $updates = [
+                'payment_status' => PaymentStatus::Paid,
+                'paid_at' => now(),
+            ];
             if ($order->status === OrderStatus::Pending) {
                 $updates['status'] = OrderStatus::Confirmed;
                 $updates['confirmed_at'] = now();

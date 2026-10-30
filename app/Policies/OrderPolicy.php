@@ -40,7 +40,46 @@ class OrderPolicy
     /** Verifikasi pembayaran tunai / refund manual. */
     public function verifyPayment(User $user, Order $order): bool
     {
-        return $user->isAdmin() || ($user->isTenantAdmin() && $order->tenant_id === $user->tenant_id);
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        if ($order->tenant_id !== $user->tenant_id) {
+            return false;
+        }
+
+        // Staf koperasi diizinkan memverifikasi pembayaran
+        if ($user->isTenantRole() && ($user->tenant?->is_koperasi ?? false)) {
+            return true;
+        }
+
+        return $user->isTenantAdmin();
+    }
+
+    /** Batalkan / void entri kasir langsung. */
+    public function voidCounter(User $user, Order $order): bool
+    {
+        if ($order->source !== 'counter') {
+            return false;
+        }
+
+        if ($order->status->isFinal() && $order->status->value === 'cancelled') {
+            return false;
+        }
+
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        if ($order->tenant_id !== $user->tenant_id) {
+            return false;
+        }
+
+        if ($user->isTenantRole() && ($user->tenant?->is_koperasi ?? false)) {
+            return true;
+        }
+
+        return $user->isTenantAdmin();
     }
 
     public function review(User $user, Order $order): bool
